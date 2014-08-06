@@ -1,0 +1,994 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//">
+<html>
+<head>
+<meta name="generator" content="JavaDoq 1.0 - DOCUment JAVA In Source" charset='utf-8'>
+<title>JavaDoq: de.general.json.JSONArray.java</title>
+<link rel ="stylesheet" type="text/css" href="../../../stylesheet.css" title="style">
+</head>
+<body>
+<table id="header" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+<td colspan="2" width="20%">&nbsp;</td>
+<td align="center" colspan="2" width="60%">
+<font size="4"><a href="http://www.javadoq.com" target="_blank">JavaDoq</a>: JSONArray.java</font>
+</td>
+<td align="right" colspan="2" width="20%">&nbsp;</td>
+</tr>
+</table>
+<pre id="java-source">
+<font id="line-number">001 </font><a name="1"></a><font id="multi-line-comment">/*
+<font id="line-number">002 </font><a name="2"></a>Copyright (c) 2002 JSON.org
+<font id="line-number">003 </font><a name="3"></a>
+<font id="line-number">004 </font><a name="4"></a>Permission is hereby granted, free of charge, to any person obtaining a copy
+<font id="line-number">005 </font><a name="5"></a>of this software and associated documentation files (the "Software"), to deal
+<font id="line-number">006 </font><a name="6"></a>in the Software without restriction, including without limitation the rights
+<font id="line-number">007 </font><a name="7"></a>to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+<font id="line-number">008 </font><a name="8"></a>copies of the Software, and to permit persons to whom the Software is
+<font id="line-number">009 </font><a name="9"></a>furnished to do so, subject to the following conditions:
+<font id="line-number">010 </font><a name="10"></a>
+<font id="line-number">011 </font><a name="11"></a>The above copyright notice and this permission notice shall be included in all
+<font id="line-number">012 </font><a name="12"></a>copies or substantial portions of the Software.
+<font id="line-number">013 </font><a name="13"></a>
+<font id="line-number">014 </font><a name="14"></a>The Software shall be used for Good, not Evil.
+<font id="line-number">015 </font><a name="15"></a>
+<font id="line-number">016 </font><a name="16"></a>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+<font id="line-number">017 </font><a name="17"></a>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+<font id="line-number">018 </font><a name="18"></a>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+<font id="line-number">019 </font><a name="19"></a>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+<font id="line-number">020 </font><a name="20"></a>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+<font id="line-number">021 </font><a name="21"></a>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+<font id="line-number">022 </font><a name="22"></a>SOFTWARE.
+<font id="line-number">023 </font><a name="23"></a>*/</font>
+<font id="line-number">024 </font><a name="24"></a>
+<font id="line-number">025 </font><a name="25"></a>
+<font id="line-number">026 </font><a name="26"></a><font id="package">package</font> <a href="../../../package.de.general.json.html" target="package-frame"><font id="identifier">de</font><font id="dot">.</font><font id="identifier">general</font><font id="dot">.</font><font id="identifier">json</font></a><font id="semi-colon">;</font>
+<font id="line-number">027 </font><a name="27"></a>
+<font id="line-number">028 </font><a name="28"></a>
+<font id="line-number">029 </font><a name="29"></a><font id="import">import</font> <font id="identifier">java</font><font id="dot">.</font><font id="identifier">io</font><font id="dot">.</font><font id="identifier">IOException</font><font id="semi-colon">;</font>
+<font id="line-number">030 </font><a name="30"></a><font id="import">import</font> <font id="identifier">java</font><font id="dot">.</font><font id="identifier">io</font><font id="dot">.</font><font id="identifier">StringWriter</font><font id="semi-colon">;</font>
+<font id="line-number">031 </font><a name="31"></a><font id="import">import</font> <font id="identifier">java</font><font id="dot">.</font><font id="identifier">io</font><font id="dot">.</font><font id="identifier">Writer</font><font id="semi-colon">;</font>
+<font id="line-number">032 </font><a name="32"></a><font id="import">import</font> <font id="identifier">java</font><font id="dot">.</font><font id="identifier">lang</font><font id="dot">.</font><font id="identifier">reflect</font><font id="dot">.</font><font id="identifier">Array</font><font id="semi-colon">;</font>
+<font id="line-number">033 </font><a name="33"></a><font id="import">import</font> <font id="identifier">java</font><font id="dot">.</font><font id="identifier">util</font><font id="dot">.</font><font id="identifier">ArrayList</font><font id="semi-colon">;</font>
+<font id="line-number">034 </font><a name="34"></a><font id="import">import</font> <font id="identifier">java</font><font id="dot">.</font><font id="identifier">util</font><font id="dot">.</font><font id="identifier">Collection</font><font id="semi-colon">;</font>
+<font id="line-number">035 </font><a name="35"></a><font id="import">import</font> <font id="identifier">java</font><font id="dot">.</font><font id="identifier">util</font><font id="dot">.</font><font id="identifier">Iterator</font><font id="semi-colon">;</font>
+<font id="line-number">036 </font><a name="36"></a><font id="import">import</font> <font id="identifier">java</font><font id="dot">.</font><font id="identifier">util</font><font id="dot">.</font><font id="identifier">Map</font><font id="semi-colon">;</font>
+<font id="line-number">037 </font><a name="37"></a>
+<font id="line-number">038 </font><a name="38"></a>
+<font id="line-number">039 </font><a name="39"></a><font id="formal-comment">/**
+<font id="line-number">040 </font><a name="40"></a>* A JSONArray is an ordered sequence of values. Its external text form is a
+<font id="line-number">041 </font><a name="41"></a>* string wrapped in square brackets with commas separating the values. The
+<font id="line-number">042 </font><a name="42"></a>* internal form is an object having &lt;code&gt;get&lt;/code&gt; and &lt;code&gt;opt&lt;/code&gt;
+<font id="line-number">043 </font><a name="43"></a>* methods for accessing the values by index, and &lt;code&gt;put&lt;/code&gt; methods for
+<font id="line-number">044 </font><a name="44"></a>* adding or replacing values. The values can be any of these types:
+<font id="line-number">045 </font><a name="45"></a>* &lt;code&gt;Boolean&lt;/code&gt;, &lt;code&gt;JSONArray&lt;/code&gt;, &lt;code&gt;JSONObject&lt;/code&gt;,
+<font id="line-number">046 </font><a name="46"></a>* &lt;code&gt;Number&lt;/code&gt;, &lt;code&gt;String&lt;/code&gt;, or the
+<font id="line-number">047 </font><a name="47"></a>* &lt;code&gt;JSONObject.NULL object&lt;/code&gt;.
+<font id="line-number">048 </font><a name="48"></a>* &lt;p&gt;
+<font id="line-number">049 </font><a name="49"></a>* The constructor can convert a JSON text into a Java object. The
+<font id="line-number">050 </font><a name="50"></a>* &lt;code&gt;toString&lt;/code&gt; method converts to JSON text.
+<font id="line-number">051 </font><a name="51"></a>* &lt;p&gt;
+<font id="line-number">052 </font><a name="52"></a>* A &lt;code&gt;get&lt;/code&gt; method returns a value if one can be found, and throws an
+<font id="line-number">053 </font><a name="53"></a>* exception if one cannot be found. An &lt;code&gt;opt&lt;/code&gt; method returns a
+<font id="line-number">054 </font><a name="54"></a>* default value instead of throwing an exception, and so is useful for
+<font id="line-number">055 </font><a name="55"></a>* obtaining optional values.
+<font id="line-number">056 </font><a name="56"></a>* &lt;p&gt;
+<font id="line-number">057 </font><a name="57"></a>* The generic &lt;code&gt;get()&lt;/code&gt; and &lt;code&gt;opt()&lt;/code&gt; methods return an
+<font id="line-number">058 </font><a name="58"></a>* object which you can cast or query for type. There are also typed
+<font id="line-number">059 </font><a name="59"></a>* &lt;code&gt;get&lt;/code&gt; and &lt;code&gt;opt&lt;/code&gt; methods that do type checking and type
+<font id="line-number">060 </font><a name="60"></a>* coercion for you.
+<font id="line-number">061 </font><a name="61"></a>* &lt;p&gt;
+<font id="line-number">062 </font><a name="62"></a>* The texts produced by the &lt;code&gt;toString&lt;/code&gt; methods strictly conform to
+<font id="line-number">063 </font><a name="63"></a>* JSON syntax rules. The constructors are more forgiving in the texts they will
+<font id="line-number">064 </font><a name="64"></a>* accept:
+<font id="line-number">065 </font><a name="65"></a>* &lt;ul&gt;
+<font id="line-number">066 </font><a name="66"></a>* &lt;li&gt;An extra &lt;code&gt;,&lt;/code&gt;&amp;nbsp;&lt;small&gt;(comma)&lt;/small&gt; may appear just
+<font id="line-number">067 </font><a name="67"></a>* before the closing bracket.&lt;/li&gt;
+<font id="line-number">068 </font><a name="68"></a>* &lt;li&gt;The &lt;code&gt;null&lt;/code&gt; value will be inserted when there is &lt;code&gt;,&lt;/code&gt;
+<font id="line-number">069 </font><a name="69"></a>* &amp;nbsp;&lt;small&gt;(comma)&lt;/small&gt; elision.&lt;/li&gt;
+<font id="line-number">070 </font><a name="70"></a>* &lt;li&gt;Strings may be quoted with &lt;code&gt;'&lt;/code&gt;&amp;nbsp;&lt;small&gt;(single
+<font id="line-number">071 </font><a name="71"></a>* quote)&lt;/small&gt;.&lt;/li&gt;
+<font id="line-number">072 </font><a name="72"></a>* &lt;li&gt;Strings do not need to be quoted at all if they do not begin with a quote
+<font id="line-number">073 </font><a name="73"></a>* or single quote, and if they do not contain leading or trailing spaces, and
+<font id="line-number">074 </font><a name="74"></a>* if they do not contain any of these characters:
+<font id="line-number">075 </font><a name="75"></a>* &lt;code&gt;{ } [ ] / \ : , #&lt;/code&gt; and if they do not look like numbers and
+<font id="line-number">076 </font><a name="76"></a>* if they are not the reserved words &lt;code&gt;true&lt;/code&gt;, &lt;code&gt;false&lt;/code&gt;, or
+<font id="line-number">077 </font><a name="77"></a>* &lt;code&gt;null&lt;/code&gt;.&lt;/li&gt;
+<font id="line-number">078 </font><a name="78"></a>* &lt;/ul&gt;
+<font id="line-number">079 </font><a name="79"></a>*
+<font id="line-number">080 </font><a name="80"></a>* @author JSON.org
+<font id="line-number">081 </font><a name="81"></a>* @version 2013-04-18
+<font id="line-number">082 </font><a name="82"></a>*/</font>
+<font id="line-number">083 </font><a name="83"></a><font id="class">class</font> <a name="de.general.json.JSONArray"></a><font id="identifier">JSONArray</font>
+<font id="line-number">084 </font><a name="84"></a><font id="left-brace">{</font>
+<font id="line-number">085 </font><a name="85"></a>
+<font id="line-number">086 </font><a name="86"></a>    <font id="single-line-comment">////////////////////////////////////////////////////////////////
+<font id="line-number">087 </font><a name="87"></a></font>    <font id="single-line-comment">// Constants
+<font id="line-number">088 </font><a name="88"></a></font>    <font id="single-line-comment">////////////////////////////////////////////////////////////////
+<font id="line-number">089 </font><a name="89"></a></font>
+<font id="line-number">090 </font><a name="90"></a>    <font id="single-line-comment">////////////////////////////////////////////////////////////////
+<font id="line-number">091 </font><a name="91"></a></font>    <font id="single-line-comment">// Variables
+<font id="line-number">092 </font><a name="92"></a></font>    <font id="single-line-comment">////////////////////////////////////////////////////////////////
+<font id="line-number">093 </font><a name="93"></a></font>
+<font id="line-number">094 </font><a name="94"></a>    <font id="formal-comment">/**
+<font id="line-number">095 </font><a name="95"></a>    * The arrayList where the JSONArray's properties are kept.
+<font id="line-number">096 </font><a name="96"></a>    */</font>
+<font id="line-number">097 </font><a name="97"></a>    <font id="private">private</font> <font id="final">final</font> <font id="identifier">ArrayList</font> <font id="identifier">myArrayList</font><font id="semi-colon">;</font>
+<font id="line-number">098 </font><a name="98"></a>
+<font id="line-number">099 </font><a name="99"></a>    <font id="single-line-comment">////////////////////////////////////////////////////////////////
+<font id="line-number">100 </font><a name="100"></a></font>    <font id="single-line-comment">// Constructors
+<font id="line-number">101 </font><a name="101"></a></font>    <font id="single-line-comment">////////////////////////////////////////////////////////////////
+<font id="line-number">102 </font><a name="102"></a></font>
+<font id="line-number">103 </font><a name="103"></a>    <font id="formal-comment">/**
+<font id="line-number">104 </font><a name="104"></a>    * Construct an empty JSONArray.
+<font id="line-number">105 </font><a name="105"></a>    */</font>
+<font id="line-number">106 </font><a name="106"></a>    <font id="protected">protected</font> <font id="identifier">JSONArray</font><font id="left-paren">(</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">107 </font><a name="107"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font> <font id="assign">=</font> <font id="new">new</font> <font id="identifier">ArrayList</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">108 </font><a name="108"></a>    <font id="right-brace">}</font>
+<font id="line-number">109 </font><a name="109"></a>
+<font id="line-number">110 </font><a name="110"></a>    <font id="formal-comment">/**
+<font id="line-number">111 </font><a name="111"></a>    * Construct a JSONArray from a JSONTokener.
+<font id="line-number">112 </font><a name="112"></a>    *
+<font id="line-number">113 </font><a name="113"></a>    * @param x
+<font id="line-number">114 </font><a name="114"></a>    * A JSONTokener
+<font id="line-number">115 </font><a name="115"></a>    * @throws JSONException
+<font id="line-number">116 </font><a name="116"></a>    * If there is a syntax error.
+<font id="line-number">117 </font><a name="117"></a>    */</font>
+<font id="line-number">118 </font><a name="118"></a>    <font id="protected">protected</font> <font id="identifier">JSONArray</font><font id="left-paren">(</font><a href="JSONTokener.java.html" target="source-frame"><font id="identifier">JSONTokener</font></a> <font id="identifier">x</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">119 </font><a name="119"></a>        <font id="this">this</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">120 </font><a name="120"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">x</font><font id="dot">.</font><font id="identifier">nextClean</font><font id="left-paren">(</font><font id="right-paren">)</font> <font id="ne">!=</font> <font id="characer-literal">'['</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">121 </font><a name="121"></a>            <font id="throw">throw</font> <font id="identifier">x</font><font id="dot">.</font><font id="identifier">syntaxError</font><font id="left-paren">(</font><font id="string-literal">"A JSONArray text must start with '['"</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">122 </font><a name="122"></a>        <font id="right-brace">}</font>
+<font id="line-number">123 </font><a name="123"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">x</font><font id="dot">.</font><font id="identifier">nextClean</font><font id="left-paren">(</font><font id="right-paren">)</font> <font id="ne">!=</font> <font id="characer-literal">']'</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">124 </font><a name="124"></a>            <font id="identifier">x</font><font id="dot">.</font><font id="identifier">back</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">125 </font><a name="125"></a>            <font id="for">for</font> <font id="left-paren">(</font><font id="semi-colon">;</font><font id="semi-colon">;</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">126 </font><a name="126"></a>                <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">x</font><font id="dot">.</font><font id="identifier">nextClean</font><font id="left-paren">(</font><font id="right-paren">)</font> <font id="eq">==</font> <font id="characer-literal">','</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">127 </font><a name="127"></a>                    <font id="identifier">x</font><font id="dot">.</font><font id="identifier">back</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">128 </font><a name="128"></a>                    <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">add</font><font id="left-paren">(</font><a href="JSONObject.java.html#de.general.json.JSONObject.NULL" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">NULL</font></a><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">129 </font><a name="129"></a>                <font id="right-brace">}</font> <font id="else">else</font> <font id="left-brace">{</font>
+<font id="line-number">130 </font><a name="130"></a>                    <font id="identifier">x</font><font id="dot">.</font><font id="identifier">back</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">131 </font><a name="131"></a>                    <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">add</font><font id="left-paren">(</font><font id="identifier">x</font><font id="dot">.</font><font id="identifier">nextValue</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">132 </font><a name="132"></a>                <font id="right-brace">}</font>
+<font id="line-number">133 </font><a name="133"></a>                <font id="switch">switch</font> <font id="left-paren">(</font><font id="identifier">x</font><font id="dot">.</font><font id="identifier">nextClean</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">134 </font><a name="134"></a>                <font id="case">case</font> <font id="characer-literal">','</font><font id="colon">:</font>
+<font id="line-number">135 </font><a name="135"></a>                    <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">x</font><font id="dot">.</font><font id="identifier">nextClean</font><font id="left-paren">(</font><font id="right-paren">)</font> <font id="eq">==</font> <font id="characer-literal">']'</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">136 </font><a name="136"></a>                        <font id="return">return</font><font id="semi-colon">;</font>
+<font id="line-number">137 </font><a name="137"></a>                    <font id="right-brace">}</font>
+<font id="line-number">138 </font><a name="138"></a>                    <font id="identifier">x</font><font id="dot">.</font><font id="identifier">back</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">139 </font><a name="139"></a>                    <font id="break">break</font><font id="semi-colon">;</font>
+<font id="line-number">140 </font><a name="140"></a>                <font id="case">case</font> <font id="characer-literal">']'</font><font id="colon">:</font>
+<font id="line-number">141 </font><a name="141"></a>                    <font id="return">return</font><font id="semi-colon">;</font>
+<font id="line-number">142 </font><a name="142"></a>                <font id="default">default</font><font id="colon">:</font>
+<font id="line-number">143 </font><a name="143"></a>                    <font id="throw">throw</font> <font id="identifier">x</font><font id="dot">.</font><font id="identifier">syntaxError</font><font id="left-paren">(</font><font id="string-literal">"Expected a ',' or ']'"</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">144 </font><a name="144"></a>                <font id="right-brace">}</font>
+<font id="line-number">145 </font><a name="145"></a>            <font id="right-brace">}</font>
+<font id="line-number">146 </font><a name="146"></a>        <font id="right-brace">}</font>
+<font id="line-number">147 </font><a name="147"></a>    <font id="right-brace">}</font>
+<font id="line-number">148 </font><a name="148"></a>
+<font id="line-number">149 </font><a name="149"></a>    <font id="formal-comment">/**
+<font id="line-number">150 </font><a name="150"></a>    * Construct a JSONArray from a source JSON text.
+<font id="line-number">151 </font><a name="151"></a>    *
+<font id="line-number">152 </font><a name="152"></a>    * @param source
+<font id="line-number">153 </font><a name="153"></a>    * A string that begins with &lt;code&gt;[&lt;/code&gt;&amp;nbsp;&lt;small&gt;(left
+<font id="line-number">154 </font><a name="154"></a>    * bracket)&lt;/small&gt; and ends with &lt;code&gt;]&lt;/code&gt;
+<font id="line-number">155 </font><a name="155"></a>    * &amp;nbsp;&lt;small&gt;(right bracket)&lt;/small&gt;.
+<font id="line-number">156 </font><a name="156"></a>    * @throws JSONException
+<font id="line-number">157 </font><a name="157"></a>    * If there is a syntax error.
+<font id="line-number">158 </font><a name="158"></a>    */</font>
+<font id="line-number">159 </font><a name="159"></a>    <font id="public">public</font> <font id="identifier">JSONArray</font><font id="left-paren">(</font><font id="identifier">String</font> <font id="identifier">source</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">160 </font><a name="160"></a>        <font id="this">this</font><font id="left-paren">(</font><font id="new">new</font> <a href="JSONTokener.java.html" target="source-frame"><font id="identifier">JSONTokener</font></a><font id="left-paren">(</font><font id="identifier">source</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">161 </font><a name="161"></a>    <font id="right-brace">}</font>
+<font id="line-number">162 </font><a name="162"></a>
+<font id="line-number">163 </font><a name="163"></a>    <font id="formal-comment">/**
+<font id="line-number">164 </font><a name="164"></a>    * Construct a JSONArray from a Collection.
+<font id="line-number">165 </font><a name="165"></a>    *
+<font id="line-number">166 </font><a name="166"></a>    * @param collection
+<font id="line-number">167 </font><a name="167"></a>    * A Collection.
+<font id="line-number">168 </font><a name="168"></a>    */</font>
+<font id="line-number">169 </font><a name="169"></a>    <font id="public">public</font> <font id="identifier">JSONArray</font><font id="left-paren">(</font><font id="identifier">Collection</font> <font id="identifier">collection</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">170 </font><a name="170"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font> <font id="assign">=</font> <font id="new">new</font> <font id="identifier">ArrayList</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">171 </font><a name="171"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">collection</font> <font id="ne">!=</font> <font id="null">null</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">172 </font><a name="172"></a>            <font id="identifier">Iterator</font> <font id="identifier">iter</font> <font id="assign">=</font> <font id="identifier">collection</font><font id="dot">.</font><font id="identifier">iterator</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">173 </font><a name="173"></a>            <font id="while">while</font> <font id="left-paren">(</font><font id="identifier">iter</font><font id="dot">.</font><font id="identifier">hasNext</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">174 </font><a name="174"></a>                <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">add</font><font id="left-paren">(</font><a href="JSONObject.java.html#de.general.json.JSONObject.wrap" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">wrap</font></a><font id="left-paren">(</font><font id="identifier">iter</font><font id="dot">.</font><font id="identifier">next</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">175 </font><a name="175"></a>            <font id="right-brace">}</font>
+<font id="line-number">176 </font><a name="176"></a>        <font id="right-brace">}</font>
+<font id="line-number">177 </font><a name="177"></a>    <font id="right-brace">}</font>
+<font id="line-number">178 </font><a name="178"></a>
+<font id="line-number">179 </font><a name="179"></a>    <font id="formal-comment">/**
+<font id="line-number">180 </font><a name="180"></a>    * Construct a JSONArray from an array
+<font id="line-number">181 </font><a name="181"></a>    *
+<font id="line-number">182 </font><a name="182"></a>    * @throws JSONException
+<font id="line-number">183 </font><a name="183"></a>    * If not an array.
+<font id="line-number">184 </font><a name="184"></a>    */</font>
+<font id="line-number">185 </font><a name="185"></a>    <font id="public">public</font> <font id="identifier">JSONArray</font><font id="left-paren">(</font><font id="identifier">Object</font> <font id="identifier">array</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">186 </font><a name="186"></a>        <font id="this">this</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">187 </font><a name="187"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">array</font><font id="dot">.</font><font id="identifier">getClass</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="dot">.</font><font id="identifier">isArray</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">188 </font><a name="188"></a>            <font id="int">int</font> <font id="identifier">length</font> <font id="assign">=</font> <font id="identifier">Array</font><font id="dot">.</font><font id="identifier">getLength</font><font id="left-paren">(</font><font id="identifier">array</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">189 </font><a name="189"></a>            <font id="for">for</font> <font id="left-paren">(</font><font id="int">int</font> <font id="identifier">i</font> <font id="assign">=</font> <font id="integer-literal">0</font><font id="semi-colon">;</font> <font id="identifier">i</font> <font id="lt">&lt;</font> <font id="identifier">length</font><font id="semi-colon">;</font> <font id="identifier">i</font> <font id="plus-assign">+=</font> <font id="integer-literal">1</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">190 </font><a name="190"></a>                <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><a href="JSONObject.java.html#de.general.json.JSONObject.wrap" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">wrap</font></a><font id="left-paren">(</font><font id="identifier">Array</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">array</font><font id="comma">,</font> <font id="identifier">i</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">191 </font><a name="191"></a>            <font id="right-brace">}</font>
+<font id="line-number">192 </font><a name="192"></a>        <font id="right-brace">}</font> <font id="else">else</font> <font id="left-brace">{</font>
+<font id="line-number">193 </font><a name="193"></a>            <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font>
+<font id="line-number">194 </font><a name="194"></a>                    <font id="string-literal">"JSONArray initial value should be a string or collection or array."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">195 </font><a name="195"></a>        <font id="right-brace">}</font>
+<font id="line-number">196 </font><a name="196"></a>    <font id="right-brace">}</font>
+<font id="line-number">197 </font><a name="197"></a>
+<font id="line-number">198 </font><a name="198"></a>    <font id="single-line-comment">////////////////////////////////////////////////////////////////
+<font id="line-number">199 </font><a name="199"></a></font>    <font id="single-line-comment">// Methods
+<font id="line-number">200 </font><a name="200"></a></font>    <font id="single-line-comment">////////////////////////////////////////////////////////////////
+<font id="line-number">201 </font><a name="201"></a></font>
+<font id="line-number">202 </font><a name="202"></a>     <font id="formal-comment">/**
+<font id="line-number">203 </font><a name="203"></a>    * Get the object value associated with an index.
+<font id="line-number">204 </font><a name="204"></a>    *
+<font id="line-number">205 </font><a name="205"></a>    * @param index
+<font id="line-number">206 </font><a name="206"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">207 </font><a name="207"></a>    * @return An object value.
+<font id="line-number">208 </font><a name="208"></a>    * @throws JSONException
+<font id="line-number">209 </font><a name="209"></a>    * If there is no value for the index.
+<font id="line-number">210 </font><a name="210"></a>    */</font>
+<font id="line-number">211 </font><a name="211"></a>    <font id="public">public</font> <font id="identifier">Object</font> <a name="de.general.json.JSONArray.get"></a><font id="identifier">get</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">212 </font><a name="212"></a>        <font id="identifier">Object</font> <font id="identifier">object</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">opt</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">213 </font><a name="213"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">object</font> <font id="eq">==</font> <font id="null">null</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">214 </font><a name="214"></a>            <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="string-literal">"JSONArray["</font> <font id="plus">+</font> <font id="identifier">index</font> <font id="plus">+</font> <font id="string-literal">"] not found."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">215 </font><a name="215"></a>        <font id="right-brace">}</font>
+<font id="line-number">216 </font><a name="216"></a>        <font id="return">return</font> <font id="identifier">object</font><font id="semi-colon">;</font>
+<font id="line-number">217 </font><a name="217"></a>    <font id="right-brace">}</font>
+<font id="line-number">218 </font><a name="218"></a>
+<font id="line-number">219 </font><a name="219"></a>    <font id="formal-comment">/**
+<font id="line-number">220 </font><a name="220"></a>    * Get the boolean value associated with an index. The string values "true"
+<font id="line-number">221 </font><a name="221"></a>    * and "false" are converted to boolean.
+<font id="line-number">222 </font><a name="222"></a>    *
+<font id="line-number">223 </font><a name="223"></a>    * @param index
+<font id="line-number">224 </font><a name="224"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">225 </font><a name="225"></a>    * @return The truth.
+<font id="line-number">226 </font><a name="226"></a>    * @throws JSONException
+<font id="line-number">227 </font><a name="227"></a>    * If there is no value for the index or if the value is not
+<font id="line-number">228 </font><a name="228"></a>    * convertible to boolean.
+<font id="line-number">229 </font><a name="229"></a>    */</font>
+<font id="line-number">230 </font><a name="230"></a>    <font id="public">public</font> <font id="boolean">boolean</font> <a name="de.general.json.JSONArray.getBoolean"></a><font id="identifier">getBoolean</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">231 </font><a name="231"></a>        <font id="identifier">Object</font> <font id="identifier">object</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">232 </font><a name="232"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">object</font><font id="dot">.</font><font id="identifier">equals</font><font id="left-paren">(</font><font id="identifier">Boolean</font><font id="dot">.</font><font id="identifier">FALSE</font><font id="right-paren">)</font>
+<font id="line-number">233 </font><a name="233"></a>                <font id="sc-or">||</font> <font id="left-paren">(</font><font id="identifier">object</font> <font id="instanceof">instanceof</font> <font id="identifier">String</font> <font id="sc-and">&amp;&amp;</font> <font id="left-paren">(</font><font id="left-paren">(</font><font id="identifier">String</font><font id="right-paren">)</font> <font id="identifier">object</font><font id="right-paren">)</font>
+<font id="line-number">234 </font><a name="234"></a>                        <font id="dot">.</font><font id="identifier">equalsIgnoreCase</font><font id="left-paren">(</font><font id="string-literal">"false"</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">235 </font><a name="235"></a>            <font id="return">return</font> <font id="false">false</font><font id="semi-colon">;</font>
+<font id="line-number">236 </font><a name="236"></a>        <font id="right-brace">}</font> <font id="else">else</font> <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">object</font><font id="dot">.</font><font id="identifier">equals</font><font id="left-paren">(</font><font id="identifier">Boolean</font><font id="dot">.</font><font id="identifier">TRUE</font><font id="right-paren">)</font>
+<font id="line-number">237 </font><a name="237"></a>                <font id="sc-or">||</font> <font id="left-paren">(</font><font id="identifier">object</font> <font id="instanceof">instanceof</font> <font id="identifier">String</font> <font id="sc-and">&amp;&amp;</font> <font id="left-paren">(</font><font id="left-paren">(</font><font id="identifier">String</font><font id="right-paren">)</font> <font id="identifier">object</font><font id="right-paren">)</font>
+<font id="line-number">238 </font><a name="238"></a>                        <font id="dot">.</font><font id="identifier">equalsIgnoreCase</font><font id="left-paren">(</font><font id="string-literal">"true"</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">239 </font><a name="239"></a>            <font id="return">return</font> <font id="true">true</font><font id="semi-colon">;</font>
+<font id="line-number">240 </font><a name="240"></a>        <font id="right-brace">}</font>
+<font id="line-number">241 </font><a name="241"></a>        <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="string-literal">"JSONArray["</font> <font id="plus">+</font> <font id="identifier">index</font> <font id="plus">+</font> <font id="string-literal">"] is not a boolean."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">242 </font><a name="242"></a>    <font id="right-brace">}</font>
+<font id="line-number">243 </font><a name="243"></a>
+<font id="line-number">244 </font><a name="244"></a>    <font id="formal-comment">/**
+<font id="line-number">245 </font><a name="245"></a>    * Get the double value associated with an index.
+<font id="line-number">246 </font><a name="246"></a>    *
+<font id="line-number">247 </font><a name="247"></a>    * @param index
+<font id="line-number">248 </font><a name="248"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">249 </font><a name="249"></a>    * @return The value.
+<font id="line-number">250 </font><a name="250"></a>    * @throws JSONException
+<font id="line-number">251 </font><a name="251"></a>    * If the key is not found or if the value cannot be converted
+<font id="line-number">252 </font><a name="252"></a>    * to a number.
+<font id="line-number">253 </font><a name="253"></a>    */</font>
+<font id="line-number">254 </font><a name="254"></a>    <font id="public">public</font> <font id="double">double</font> <a name="de.general.json.JSONArray.getDouble"></a><font id="identifier">getDouble</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">255 </font><a name="255"></a>        <font id="identifier">Object</font> <font id="identifier">object</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">256 </font><a name="256"></a>        <font id="try">try</font> <font id="left-brace">{</font>
+<font id="line-number">257 </font><a name="257"></a>            <font id="return">return</font> <font id="identifier">object</font> <font id="instanceof">instanceof</font> <font id="identifier">Number</font> <font id="hook">?</font> <font id="left-paren">(</font><font id="left-paren">(</font><font id="identifier">Number</font><font id="right-paren">)</font> <font id="identifier">object</font><font id="right-paren">)</font><font id="dot">.</font><font id="identifier">doubleValue</font><font id="left-paren">(</font><font id="right-paren">)</font>
+<font id="line-number">258 </font><a name="258"></a>                    <font id="colon">:</font> <font id="identifier">Double</font><font id="dot">.</font><font id="identifier">parseDouble</font><font id="left-paren">(</font><font id="left-paren">(</font><font id="identifier">String</font><font id="right-paren">)</font> <font id="identifier">object</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">259 </font><a name="259"></a>        <font id="right-brace">}</font> <font id="catch">catch</font> <font id="left-paren">(</font><font id="identifier">Exception</font> <font id="identifier">e</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">260 </font><a name="260"></a>            <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="string-literal">"JSONArray["</font> <font id="plus">+</font> <font id="identifier">index</font> <font id="plus">+</font> <font id="string-literal">"] is not a number."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">261 </font><a name="261"></a>        <font id="right-brace">}</font>
+<font id="line-number">262 </font><a name="262"></a>    <font id="right-brace">}</font>
+<font id="line-number">263 </font><a name="263"></a>
+<font id="line-number">264 </font><a name="264"></a>    <font id="formal-comment">/**
+<font id="line-number">265 </font><a name="265"></a>    * Get the int value associated with an index.
+<font id="line-number">266 </font><a name="266"></a>    *
+<font id="line-number">267 </font><a name="267"></a>    * @param index
+<font id="line-number">268 </font><a name="268"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">269 </font><a name="269"></a>    * @return The value.
+<font id="line-number">270 </font><a name="270"></a>    * @throws JSONException
+<font id="line-number">271 </font><a name="271"></a>    * If the key is not found or if the value is not a number.
+<font id="line-number">272 </font><a name="272"></a>    */</font>
+<font id="line-number">273 </font><a name="273"></a>    <font id="public">public</font> <font id="int">int</font> <a name="de.general.json.JSONArray.getInt"></a><font id="identifier">getInt</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">274 </font><a name="274"></a>        <font id="identifier">Object</font> <font id="identifier">object</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">275 </font><a name="275"></a>        <font id="try">try</font> <font id="left-brace">{</font>
+<font id="line-number">276 </font><a name="276"></a>            <font id="return">return</font> <font id="identifier">object</font> <font id="instanceof">instanceof</font> <font id="identifier">Number</font> <font id="hook">?</font> <font id="left-paren">(</font><font id="left-paren">(</font><font id="identifier">Number</font><font id="right-paren">)</font> <font id="identifier">object</font><font id="right-paren">)</font><font id="dot">.</font><font id="identifier">intValue</font><font id="left-paren">(</font><font id="right-paren">)</font>
+<font id="line-number">277 </font><a name="277"></a>                    <font id="colon">:</font> <font id="identifier">Integer</font><font id="dot">.</font><font id="identifier">parseInt</font><font id="left-paren">(</font><font id="left-paren">(</font><font id="identifier">String</font><font id="right-paren">)</font> <font id="identifier">object</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">278 </font><a name="278"></a>        <font id="right-brace">}</font> <font id="catch">catch</font> <font id="left-paren">(</font><font id="identifier">Exception</font> <font id="identifier">e</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">279 </font><a name="279"></a>            <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="string-literal">"JSONArray["</font> <font id="plus">+</font> <font id="identifier">index</font> <font id="plus">+</font> <font id="string-literal">"] is not a number."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">280 </font><a name="280"></a>        <font id="right-brace">}</font>
+<font id="line-number">281 </font><a name="281"></a>    <font id="right-brace">}</font>
+<font id="line-number">282 </font><a name="282"></a>
+<font id="line-number">283 </font><a name="283"></a>    <font id="formal-comment">/**
+<font id="line-number">284 </font><a name="284"></a>    * Get the JSONArray associated with an index.
+<font id="line-number">285 </font><a name="285"></a>    *
+<font id="line-number">286 </font><a name="286"></a>    * @param index
+<font id="line-number">287 </font><a name="287"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">288 </font><a name="288"></a>    * @return A JSONArray value.
+<font id="line-number">289 </font><a name="289"></a>    * @throws JSONException
+<font id="line-number">290 </font><a name="290"></a>    * If there is no value for the index. or if the value is not a
+<font id="line-number">291 </font><a name="291"></a>    * JSONArray
+<font id="line-number">292 </font><a name="292"></a>    */</font>
+<font id="line-number">293 </font><a name="293"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.getJSONArray"></a><font id="identifier">getJSONArray</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">294 </font><a name="294"></a>        <font id="identifier">Object</font> <font id="identifier">object</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">295 </font><a name="295"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">object</font> <font id="instanceof">instanceof</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">296 </font><a name="296"></a>            <font id="return">return</font> <font id="left-paren">(</font><a href="#" target="source-frame"><font id="identifier">JSONArray</font></a><font id="right-paren">)</font> <font id="identifier">object</font><font id="semi-colon">;</font>
+<font id="line-number">297 </font><a name="297"></a>        <font id="right-brace">}</font>
+<font id="line-number">298 </font><a name="298"></a>        <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="string-literal">"JSONArray["</font> <font id="plus">+</font> <font id="identifier">index</font> <font id="plus">+</font> <font id="string-literal">"] is not a JSONArray."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">299 </font><a name="299"></a>    <font id="right-brace">}</font>
+<font id="line-number">300 </font><a name="300"></a>
+<font id="line-number">301 </font><a name="301"></a>    <font id="formal-comment">/**
+<font id="line-number">302 </font><a name="302"></a>    * Get the JSONObject associated with an index.
+<font id="line-number">303 </font><a name="303"></a>    *
+<font id="line-number">304 </font><a name="304"></a>    * @param index
+<font id="line-number">305 </font><a name="305"></a>    * subscript
+<font id="line-number">306 </font><a name="306"></a>    * @return A JSONObject value.
+<font id="line-number">307 </font><a name="307"></a>    * @throws JSONException
+<font id="line-number">308 </font><a name="308"></a>    * If there is no value for the index or if the value is not a
+<font id="line-number">309 </font><a name="309"></a>    * JSONObject
+<font id="line-number">310 </font><a name="310"></a>    */</font>
+<font id="line-number">311 </font><a name="311"></a>    <font id="public">public</font> <a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a> <a name="de.general.json.JSONArray.getJSONObject"></a><font id="identifier">getJSONObject</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">312 </font><a name="312"></a>        <font id="identifier">Object</font> <font id="identifier">object</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">313 </font><a name="313"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">object</font> <font id="instanceof">instanceof</font> <a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">314 </font><a name="314"></a>            <font id="return">return</font> <font id="left-paren">(</font><a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a><font id="right-paren">)</font> <font id="identifier">object</font><font id="semi-colon">;</font>
+<font id="line-number">315 </font><a name="315"></a>        <font id="right-brace">}</font>
+<font id="line-number">316 </font><a name="316"></a>        <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="string-literal">"JSONArray["</font> <font id="plus">+</font> <font id="identifier">index</font> <font id="plus">+</font> <font id="string-literal">"] is not a JSONObject."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">317 </font><a name="317"></a>    <font id="right-brace">}</font>
+<font id="line-number">318 </font><a name="318"></a>
+<font id="line-number">319 </font><a name="319"></a>    <font id="formal-comment">/**
+<font id="line-number">320 </font><a name="320"></a>    * Get the long value associated with an index.
+<font id="line-number">321 </font><a name="321"></a>    *
+<font id="line-number">322 </font><a name="322"></a>    * @param index
+<font id="line-number">323 </font><a name="323"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">324 </font><a name="324"></a>    * @return The value.
+<font id="line-number">325 </font><a name="325"></a>    * @throws JSONException
+<font id="line-number">326 </font><a name="326"></a>    * If the key is not found or if the value cannot be converted
+<font id="line-number">327 </font><a name="327"></a>    * to a number.
+<font id="line-number">328 </font><a name="328"></a>    */</font>
+<font id="line-number">329 </font><a name="329"></a>    <font id="public">public</font> <font id="long">long</font> <a name="de.general.json.JSONArray.getLong"></a><font id="identifier">getLong</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">330 </font><a name="330"></a>        <font id="identifier">Object</font> <font id="identifier">object</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">331 </font><a name="331"></a>        <font id="try">try</font> <font id="left-brace">{</font>
+<font id="line-number">332 </font><a name="332"></a>            <font id="return">return</font> <font id="identifier">object</font> <font id="instanceof">instanceof</font> <font id="identifier">Number</font> <font id="hook">?</font> <font id="left-paren">(</font><font id="left-paren">(</font><font id="identifier">Number</font><font id="right-paren">)</font> <font id="identifier">object</font><font id="right-paren">)</font><font id="dot">.</font><font id="identifier">longValue</font><font id="left-paren">(</font><font id="right-paren">)</font>
+<font id="line-number">333 </font><a name="333"></a>                    <font id="colon">:</font> <font id="identifier">Long</font><font id="dot">.</font><font id="identifier">parseLong</font><font id="left-paren">(</font><font id="left-paren">(</font><font id="identifier">String</font><font id="right-paren">)</font> <font id="identifier">object</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">334 </font><a name="334"></a>        <font id="right-brace">}</font> <font id="catch">catch</font> <font id="left-paren">(</font><font id="identifier">Exception</font> <font id="identifier">e</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">335 </font><a name="335"></a>            <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="string-literal">"JSONArray["</font> <font id="plus">+</font> <font id="identifier">index</font> <font id="plus">+</font> <font id="string-literal">"] is not a number."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">336 </font><a name="336"></a>        <font id="right-brace">}</font>
+<font id="line-number">337 </font><a name="337"></a>    <font id="right-brace">}</font>
+<font id="line-number">338 </font><a name="338"></a>
+<font id="line-number">339 </font><a name="339"></a>    <font id="formal-comment">/**
+<font id="line-number">340 </font><a name="340"></a>    * Get the string associated with an index.
+<font id="line-number">341 </font><a name="341"></a>    *
+<font id="line-number">342 </font><a name="342"></a>    * @param index
+<font id="line-number">343 </font><a name="343"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">344 </font><a name="344"></a>    * @return A string value.
+<font id="line-number">345 </font><a name="345"></a>    * @throws JSONException
+<font id="line-number">346 </font><a name="346"></a>    * If there is no string value for the index.
+<font id="line-number">347 </font><a name="347"></a>    */</font>
+<font id="line-number">348 </font><a name="348"></a>    <font id="public">public</font> <font id="identifier">String</font> <a name="de.general.json.JSONArray.getString"></a><font id="identifier">getString</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">349 </font><a name="349"></a>        <font id="identifier">Object</font> <font id="identifier">object</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">350 </font><a name="350"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">object</font> <font id="instanceof">instanceof</font> <font id="identifier">String</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">351 </font><a name="351"></a>            <font id="return">return</font> <font id="left-paren">(</font><font id="identifier">String</font><font id="right-paren">)</font> <font id="identifier">object</font><font id="semi-colon">;</font>
+<font id="line-number">352 </font><a name="352"></a>        <font id="right-brace">}</font>
+<font id="line-number">353 </font><a name="353"></a>        <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="string-literal">"JSONArray["</font> <font id="plus">+</font> <font id="identifier">index</font> <font id="plus">+</font> <font id="string-literal">"] not a string."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">354 </font><a name="354"></a>    <font id="right-brace">}</font>
+<font id="line-number">355 </font><a name="355"></a>
+<font id="line-number">356 </font><a name="356"></a>    <font id="formal-comment">/**
+<font id="line-number">357 </font><a name="357"></a>    * Determine if the value is null.
+<font id="line-number">358 </font><a name="358"></a>    *
+<font id="line-number">359 </font><a name="359"></a>    * @param index
+<font id="line-number">360 </font><a name="360"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">361 </font><a name="361"></a>    * @return true if the value at the index is null, or if there is no value.
+<font id="line-number">362 </font><a name="362"></a>    */</font>
+<font id="line-number">363 </font><a name="363"></a>    <font id="public">public</font> <font id="boolean">boolean</font> <a name="de.general.json.JSONArray.isNull"></a><font id="identifier">isNull</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">364 </font><a name="364"></a>        <font id="return">return</font> <a href="JSONObject.java.html#de.general.json.JSONObject.NULL.equals" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">NULL</font><font id="dot">.</font><font id="identifier">equals</font></a><font id="left-paren">(</font><font id="this">this</font><font id="dot">.</font><font id="identifier">opt</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">365 </font><a name="365"></a>    <font id="right-brace">}</font>
+<font id="line-number">366 </font><a name="366"></a>
+<font id="line-number">367 </font><a name="367"></a>    <font id="formal-comment">/**
+<font id="line-number">368 </font><a name="368"></a>    * Make a string from the contents of this JSONArray. The
+<font id="line-number">369 </font><a name="369"></a>    * &lt;code&gt;separator&lt;/code&gt; string is inserted between each element. Warning:
+<font id="line-number">370 </font><a name="370"></a>    * This method assumes that the data structure is acyclical.
+<font id="line-number">371 </font><a name="371"></a>    *
+<font id="line-number">372 </font><a name="372"></a>    * @param separator
+<font id="line-number">373 </font><a name="373"></a>    * A string that will be inserted between the elements.
+<font id="line-number">374 </font><a name="374"></a>    * @return a string.
+<font id="line-number">375 </font><a name="375"></a>    * @throws JSONException
+<font id="line-number">376 </font><a name="376"></a>    * If the array contains an invalid number.
+<font id="line-number">377 </font><a name="377"></a>    */</font>
+<font id="line-number">378 </font><a name="378"></a>    <font id="public">public</font> <font id="identifier">String</font> <a name="de.general.json.JSONArray.join"></a><font id="identifier">join</font><font id="left-paren">(</font><font id="identifier">String</font> <font id="identifier">separator</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">379 </font><a name="379"></a>        <font id="int">int</font> <font id="identifier">len</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">length</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">380 </font><a name="380"></a>        <font id="identifier">StringBuffer</font> <font id="identifier">sb</font> <font id="assign">=</font> <font id="new">new</font> <font id="identifier">StringBuffer</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">381 </font><a name="381"></a>
+<font id="line-number">382 </font><a name="382"></a>        <font id="for">for</font> <font id="left-paren">(</font><font id="int">int</font> <font id="identifier">i</font> <font id="assign">=</font> <font id="integer-literal">0</font><font id="semi-colon">;</font> <font id="identifier">i</font> <font id="lt">&lt;</font> <font id="identifier">len</font><font id="semi-colon">;</font> <font id="identifier">i</font> <font id="plus-assign">+=</font> <font id="integer-literal">1</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">383 </font><a name="383"></a>            <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">i</font> <font id="gt">&gt;</font> <font id="integer-literal">0</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">384 </font><a name="384"></a>                <font id="identifier">sb</font><font id="dot">.</font><font id="identifier">append</font><font id="left-paren">(</font><font id="identifier">separator</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">385 </font><a name="385"></a>            <font id="right-brace">}</font>
+<font id="line-number">386 </font><a name="386"></a>            <font id="identifier">sb</font><font id="dot">.</font><font id="identifier">append</font><font id="left-paren">(</font><a href="JSONObject.java.html#de.general.json.JSONObject.valueToString" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">valueToString</font></a><font id="left-paren">(</font><font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">i</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">387 </font><a name="387"></a>        <font id="right-brace">}</font>
+<font id="line-number">388 </font><a name="388"></a>        <font id="return">return</font> <font id="identifier">sb</font><font id="dot">.</font><font id="identifier">toString</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">389 </font><a name="389"></a>    <font id="right-brace">}</font>
+<font id="line-number">390 </font><a name="390"></a>
+<font id="line-number">391 </font><a name="391"></a>    <font id="formal-comment">/**
+<font id="line-number">392 </font><a name="392"></a>    * Get the number of elements in the JSONArray, included nulls.
+<font id="line-number">393 </font><a name="393"></a>    *
+<font id="line-number">394 </font><a name="394"></a>    * @return The length (or size).
+<font id="line-number">395 </font><a name="395"></a>    */</font>
+<font id="line-number">396 </font><a name="396"></a>    <font id="public">public</font> <font id="int">int</font> <a name="de.general.json.JSONArray.length"></a><font id="identifier">length</font><font id="left-paren">(</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">397 </font><a name="397"></a>        <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">size</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">398 </font><a name="398"></a>    <font id="right-brace">}</font>
+<font id="line-number">399 </font><a name="399"></a>
+<font id="line-number">400 </font><a name="400"></a>    <font id="formal-comment">/**
+<font id="line-number">401 </font><a name="401"></a>    * Get the optional object value associated with an index.
+<font id="line-number">402 </font><a name="402"></a>    *
+<font id="line-number">403 </font><a name="403"></a>    * @param index
+<font id="line-number">404 </font><a name="404"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">405 </font><a name="405"></a>    * @return An object value, or null if there is no object at that index.
+<font id="line-number">406 </font><a name="406"></a>    */</font>
+<font id="line-number">407 </font><a name="407"></a>    <font id="public">public</font> <font id="identifier">Object</font> <a name="de.general.json.JSONArray.opt"></a><font id="identifier">opt</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">408 </font><a name="408"></a>        <font id="return">return</font> <font id="left-paren">(</font><font id="identifier">index</font> <font id="lt">&lt;</font> <font id="integer-literal">0</font> <font id="sc-or">||</font> <font id="identifier">index</font> <font id="ge">&gt;=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">length</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="right-paren">)</font> <font id="hook">?</font> <font id="null">null</font> <font id="colon">:</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font>
+<font id="line-number">409 </font><a name="409"></a>                <font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">410 </font><a name="410"></a>    <font id="right-brace">}</font>
+<font id="line-number">411 </font><a name="411"></a>
+<font id="line-number">412 </font><a name="412"></a>    <font id="formal-comment">/**
+<font id="line-number">413 </font><a name="413"></a>    * Get the optional boolean value associated with an index. It returns false
+<font id="line-number">414 </font><a name="414"></a>    * if there is no value at that index, or if the value is not Boolean.TRUE
+<font id="line-number">415 </font><a name="415"></a>    * or the String "true".
+<font id="line-number">416 </font><a name="416"></a>    *
+<font id="line-number">417 </font><a name="417"></a>    * @param index
+<font id="line-number">418 </font><a name="418"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">419 </font><a name="419"></a>    * @return The truth.
+<font id="line-number">420 </font><a name="420"></a>    */</font>
+<font id="line-number">421 </font><a name="421"></a>    <font id="public">public</font> <font id="boolean">boolean</font> <a name="de.general.json.JSONArray.optBoolean"></a><font id="identifier">optBoolean</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">422 </font><a name="422"></a>        <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">optBoolean</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="false">false</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">423 </font><a name="423"></a>    <font id="right-brace">}</font>
+<font id="line-number">424 </font><a name="424"></a>
+<font id="line-number">425 </font><a name="425"></a>    <font id="formal-comment">/**
+<font id="line-number">426 </font><a name="426"></a>    * Get the optional boolean value associated with an index. It returns the
+<font id="line-number">427 </font><a name="427"></a>    * defaultValue if there is no value at that index or if it is not a Boolean
+<font id="line-number">428 </font><a name="428"></a>    * or the String "true" or "false" (case insensitive).
+<font id="line-number">429 </font><a name="429"></a>    *
+<font id="line-number">430 </font><a name="430"></a>    * @param index
+<font id="line-number">431 </font><a name="431"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">432 </font><a name="432"></a>    * @param defaultValue
+<font id="line-number">433 </font><a name="433"></a>    * A boolean default.
+<font id="line-number">434 </font><a name="434"></a>    * @return The truth.
+<font id="line-number">435 </font><a name="435"></a>    */</font>
+<font id="line-number">436 </font><a name="436"></a>    <font id="public">public</font> <font id="boolean">boolean</font> <a name="de.general.json.JSONArray.optBoolean"></a><font id="identifier">optBoolean</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="boolean">boolean</font> <font id="identifier">defaultValue</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">437 </font><a name="437"></a>        <font id="try">try</font> <font id="left-brace">{</font>
+<font id="line-number">438 </font><a name="438"></a>            <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">getBoolean</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">439 </font><a name="439"></a>        <font id="right-brace">}</font> <font id="catch">catch</font> <font id="left-paren">(</font><font id="identifier">Exception</font> <font id="identifier">e</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">440 </font><a name="440"></a>            <font id="return">return</font> <font id="identifier">defaultValue</font><font id="semi-colon">;</font>
+<font id="line-number">441 </font><a name="441"></a>        <font id="right-brace">}</font>
+<font id="line-number">442 </font><a name="442"></a>    <font id="right-brace">}</font>
+<font id="line-number">443 </font><a name="443"></a>
+<font id="line-number">444 </font><a name="444"></a>    <font id="formal-comment">/**
+<font id="line-number">445 </font><a name="445"></a>    * Get the optional double value associated with an index. NaN is returned
+<font id="line-number">446 </font><a name="446"></a>    * if there is no value for the index, or if the value is not a number and
+<font id="line-number">447 </font><a name="447"></a>    * cannot be converted to a number.
+<font id="line-number">448 </font><a name="448"></a>    *
+<font id="line-number">449 </font><a name="449"></a>    * @param index
+<font id="line-number">450 </font><a name="450"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">451 </font><a name="451"></a>    * @return The value.
+<font id="line-number">452 </font><a name="452"></a>    */</font>
+<font id="line-number">453 </font><a name="453"></a>    <font id="public">public</font> <font id="double">double</font> <a name="de.general.json.JSONArray.optDouble"></a><font id="identifier">optDouble</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">454 </font><a name="454"></a>        <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">optDouble</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="identifier">Double</font><font id="dot">.</font><font id="identifier">NaN</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">455 </font><a name="455"></a>    <font id="right-brace">}</font>
+<font id="line-number">456 </font><a name="456"></a>
+<font id="line-number">457 </font><a name="457"></a>    <font id="formal-comment">/**
+<font id="line-number">458 </font><a name="458"></a>    * Get the optional double value associated with an index. The defaultValue
+<font id="line-number">459 </font><a name="459"></a>    * is returned if there is no value for the index, or if the value is not a
+<font id="line-number">460 </font><a name="460"></a>    * number and cannot be converted to a number.
+<font id="line-number">461 </font><a name="461"></a>    *
+<font id="line-number">462 </font><a name="462"></a>    * @param index
+<font id="line-number">463 </font><a name="463"></a>    * subscript
+<font id="line-number">464 </font><a name="464"></a>    * @param defaultValue
+<font id="line-number">465 </font><a name="465"></a>    * The default value.
+<font id="line-number">466 </font><a name="466"></a>    * @return The value.
+<font id="line-number">467 </font><a name="467"></a>    */</font>
+<font id="line-number">468 </font><a name="468"></a>    <font id="public">public</font> <font id="double">double</font> <a name="de.general.json.JSONArray.optDouble"></a><font id="identifier">optDouble</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="double">double</font> <font id="identifier">defaultValue</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">469 </font><a name="469"></a>        <font id="try">try</font> <font id="left-brace">{</font>
+<font id="line-number">470 </font><a name="470"></a>            <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">getDouble</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">471 </font><a name="471"></a>        <font id="right-brace">}</font> <font id="catch">catch</font> <font id="left-paren">(</font><font id="identifier">Exception</font> <font id="identifier">e</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">472 </font><a name="472"></a>            <font id="return">return</font> <font id="identifier">defaultValue</font><font id="semi-colon">;</font>
+<font id="line-number">473 </font><a name="473"></a>        <font id="right-brace">}</font>
+<font id="line-number">474 </font><a name="474"></a>    <font id="right-brace">}</font>
+<font id="line-number">475 </font><a name="475"></a>
+<font id="line-number">476 </font><a name="476"></a>    <font id="formal-comment">/**
+<font id="line-number">477 </font><a name="477"></a>    * Get the optional int value associated with an index. Zero is returned if
+<font id="line-number">478 </font><a name="478"></a>    * there is no value for the index, or if the value is not a number and
+<font id="line-number">479 </font><a name="479"></a>    * cannot be converted to a number.
+<font id="line-number">480 </font><a name="480"></a>    *
+<font id="line-number">481 </font><a name="481"></a>    * @param index
+<font id="line-number">482 </font><a name="482"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">483 </font><a name="483"></a>    * @return The value.
+<font id="line-number">484 </font><a name="484"></a>    */</font>
+<font id="line-number">485 </font><a name="485"></a>    <font id="public">public</font> <font id="int">int</font> <a name="de.general.json.JSONArray.optInt"></a><font id="identifier">optInt</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">486 </font><a name="486"></a>        <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">optInt</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="integer-literal">0</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">487 </font><a name="487"></a>    <font id="right-brace">}</font>
+<font id="line-number">488 </font><a name="488"></a>
+<font id="line-number">489 </font><a name="489"></a>    <font id="formal-comment">/**
+<font id="line-number">490 </font><a name="490"></a>    * Get the optional int value associated with an index. The defaultValue is
+<font id="line-number">491 </font><a name="491"></a>    * returned if there is no value for the index, or if the value is not a
+<font id="line-number">492 </font><a name="492"></a>    * number and cannot be converted to a number.
+<font id="line-number">493 </font><a name="493"></a>    *
+<font id="line-number">494 </font><a name="494"></a>    * @param index
+<font id="line-number">495 </font><a name="495"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">496 </font><a name="496"></a>    * @param defaultValue
+<font id="line-number">497 </font><a name="497"></a>    * The default value.
+<font id="line-number">498 </font><a name="498"></a>    * @return The value.
+<font id="line-number">499 </font><a name="499"></a>    */</font>
+<font id="line-number">500 </font><a name="500"></a>    <font id="public">public</font> <font id="int">int</font> <a name="de.general.json.JSONArray.optInt"></a><font id="identifier">optInt</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="int">int</font> <font id="identifier">defaultValue</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">501 </font><a name="501"></a>        <font id="try">try</font> <font id="left-brace">{</font>
+<font id="line-number">502 </font><a name="502"></a>            <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">getInt</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">503 </font><a name="503"></a>        <font id="right-brace">}</font> <font id="catch">catch</font> <font id="left-paren">(</font><font id="identifier">Exception</font> <font id="identifier">e</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">504 </font><a name="504"></a>            <font id="return">return</font> <font id="identifier">defaultValue</font><font id="semi-colon">;</font>
+<font id="line-number">505 </font><a name="505"></a>        <font id="right-brace">}</font>
+<font id="line-number">506 </font><a name="506"></a>    <font id="right-brace">}</font>
+<font id="line-number">507 </font><a name="507"></a>
+<font id="line-number">508 </font><a name="508"></a>    <font id="formal-comment">/**
+<font id="line-number">509 </font><a name="509"></a>    * Get the optional JSONArray associated with an index.
+<font id="line-number">510 </font><a name="510"></a>    *
+<font id="line-number">511 </font><a name="511"></a>    * @param index
+<font id="line-number">512 </font><a name="512"></a>    * subscript
+<font id="line-number">513 </font><a name="513"></a>    * @return A JSONArray value, or null if the index has no value, or if the
+<font id="line-number">514 </font><a name="514"></a>    * value is not a JSONArray.
+<font id="line-number">515 </font><a name="515"></a>    */</font>
+<font id="line-number">516 </font><a name="516"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.optJSONArray"></a><font id="identifier">optJSONArray</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">517 </font><a name="517"></a>        <font id="identifier">Object</font> <font id="identifier">o</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">opt</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">518 </font><a name="518"></a>        <font id="return">return</font> <font id="identifier">o</font> <font id="instanceof">instanceof</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <font id="hook">?</font> <font id="left-paren">(</font><a href="#" target="source-frame"><font id="identifier">JSONArray</font></a><font id="right-paren">)</font> <font id="identifier">o</font> <font id="colon">:</font> <font id="null">null</font><font id="semi-colon">;</font>
+<font id="line-number">519 </font><a name="519"></a>    <font id="right-brace">}</font>
+<font id="line-number">520 </font><a name="520"></a>
+<font id="line-number">521 </font><a name="521"></a>    <font id="formal-comment">/**
+<font id="line-number">522 </font><a name="522"></a>    * Get the optional JSONObject associated with an index. Null is returned if
+<font id="line-number">523 </font><a name="523"></a>    * the key is not found, or null if the index has no value, or if the value
+<font id="line-number">524 </font><a name="524"></a>    * is not a JSONObject.
+<font id="line-number">525 </font><a name="525"></a>    *
+<font id="line-number">526 </font><a name="526"></a>    * @param index
+<font id="line-number">527 </font><a name="527"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">528 </font><a name="528"></a>    * @return A JSONObject value.
+<font id="line-number">529 </font><a name="529"></a>    */</font>
+<font id="line-number">530 </font><a name="530"></a>    <font id="public">public</font> <a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a> <a name="de.general.json.JSONArray.optJSONObject"></a><font id="identifier">optJSONObject</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">531 </font><a name="531"></a>        <font id="identifier">Object</font> <font id="identifier">o</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">opt</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">532 </font><a name="532"></a>        <font id="return">return</font> <font id="identifier">o</font> <font id="instanceof">instanceof</font> <a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a> <font id="hook">?</font> <font id="left-paren">(</font><a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a><font id="right-paren">)</font> <font id="identifier">o</font> <font id="colon">:</font> <font id="null">null</font><font id="semi-colon">;</font>
+<font id="line-number">533 </font><a name="533"></a>    <font id="right-brace">}</font>
+<font id="line-number">534 </font><a name="534"></a>
+<font id="line-number">535 </font><a name="535"></a>    <font id="formal-comment">/**
+<font id="line-number">536 </font><a name="536"></a>    * Get the optional long value associated with an index. Zero is returned if
+<font id="line-number">537 </font><a name="537"></a>    * there is no value for the index, or if the value is not a number and
+<font id="line-number">538 </font><a name="538"></a>    * cannot be converted to a number.
+<font id="line-number">539 </font><a name="539"></a>    *
+<font id="line-number">540 </font><a name="540"></a>    * @param index
+<font id="line-number">541 </font><a name="541"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">542 </font><a name="542"></a>    * @return The value.
+<font id="line-number">543 </font><a name="543"></a>    */</font>
+<font id="line-number">544 </font><a name="544"></a>    <font id="public">public</font> <font id="long">long</font> <a name="de.general.json.JSONArray.optLong"></a><font id="identifier">optLong</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">545 </font><a name="545"></a>        <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">optLong</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="integer-literal">0</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">546 </font><a name="546"></a>    <font id="right-brace">}</font>
+<font id="line-number">547 </font><a name="547"></a>
+<font id="line-number">548 </font><a name="548"></a>    <font id="formal-comment">/**
+<font id="line-number">549 </font><a name="549"></a>    * Get the optional long value associated with an index. The defaultValue is
+<font id="line-number">550 </font><a name="550"></a>    * returned if there is no value for the index, or if the value is not a
+<font id="line-number">551 </font><a name="551"></a>    * number and cannot be converted to a number.
+<font id="line-number">552 </font><a name="552"></a>    *
+<font id="line-number">553 </font><a name="553"></a>    * @param index
+<font id="line-number">554 </font><a name="554"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">555 </font><a name="555"></a>    * @param defaultValue
+<font id="line-number">556 </font><a name="556"></a>    * The default value.
+<font id="line-number">557 </font><a name="557"></a>    * @return The value.
+<font id="line-number">558 </font><a name="558"></a>    */</font>
+<font id="line-number">559 </font><a name="559"></a>    <font id="public">public</font> <font id="long">long</font> <a name="de.general.json.JSONArray.optLong"></a><font id="identifier">optLong</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="long">long</font> <font id="identifier">defaultValue</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">560 </font><a name="560"></a>        <font id="try">try</font> <font id="left-brace">{</font>
+<font id="line-number">561 </font><a name="561"></a>            <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">getLong</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">562 </font><a name="562"></a>        <font id="right-brace">}</font> <font id="catch">catch</font> <font id="left-paren">(</font><font id="identifier">Exception</font> <font id="identifier">e</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">563 </font><a name="563"></a>            <font id="return">return</font> <font id="identifier">defaultValue</font><font id="semi-colon">;</font>
+<font id="line-number">564 </font><a name="564"></a>        <font id="right-brace">}</font>
+<font id="line-number">565 </font><a name="565"></a>    <font id="right-brace">}</font>
+<font id="line-number">566 </font><a name="566"></a>
+<font id="line-number">567 </font><a name="567"></a>    <font id="formal-comment">/**
+<font id="line-number">568 </font><a name="568"></a>    * Get the optional string value associated with an index. It returns an
+<font id="line-number">569 </font><a name="569"></a>    * empty string if there is no value at that index. If the value is not a
+<font id="line-number">570 </font><a name="570"></a>    * string and is not null, then it is coverted to a string.
+<font id="line-number">571 </font><a name="571"></a>    *
+<font id="line-number">572 </font><a name="572"></a>    * @param index
+<font id="line-number">573 </font><a name="573"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">574 </font><a name="574"></a>    * @return A String value.
+<font id="line-number">575 </font><a name="575"></a>    */</font>
+<font id="line-number">576 </font><a name="576"></a>    <font id="public">public</font> <font id="identifier">String</font> <a name="de.general.json.JSONArray.optString"></a><font id="identifier">optString</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">577 </font><a name="577"></a>        <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">optString</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="string-literal">""</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">578 </font><a name="578"></a>    <font id="right-brace">}</font>
+<font id="line-number">579 </font><a name="579"></a>
+<font id="line-number">580 </font><a name="580"></a>    <font id="formal-comment">/**
+<font id="line-number">581 </font><a name="581"></a>    * Get the optional string associated with an index. The defaultValue is
+<font id="line-number">582 </font><a name="582"></a>    * returned if the key is not found.
+<font id="line-number">583 </font><a name="583"></a>    *
+<font id="line-number">584 </font><a name="584"></a>    * @param index
+<font id="line-number">585 </font><a name="585"></a>    * The index must be between 0 and length() - 1.
+<font id="line-number">586 </font><a name="586"></a>    * @param defaultValue
+<font id="line-number">587 </font><a name="587"></a>    * The default value.
+<font id="line-number">588 </font><a name="588"></a>    * @return A String value.
+<font id="line-number">589 </font><a name="589"></a>    */</font>
+<font id="line-number">590 </font><a name="590"></a>    <font id="public">public</font> <font id="identifier">String</font> <a name="de.general.json.JSONArray.optString"></a><font id="identifier">optString</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="identifier">String</font> <font id="identifier">defaultValue</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">591 </font><a name="591"></a>        <font id="identifier">Object</font> <font id="identifier">object</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">opt</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">592 </font><a name="592"></a>        <font id="return">return</font> <a href="JSONObject.java.html#de.general.json.JSONObject.NULL.equals" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">NULL</font><font id="dot">.</font><font id="identifier">equals</font></a><font id="left-paren">(</font><font id="identifier">object</font><font id="right-paren">)</font> <font id="hook">?</font> <font id="identifier">defaultValue</font> <font id="colon">:</font> <font id="identifier">object</font>
+<font id="line-number">593 </font><a name="593"></a>                <font id="dot">.</font><font id="identifier">toString</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">594 </font><a name="594"></a>    <font id="right-brace">}</font>
+<font id="line-number">595 </font><a name="595"></a>
+<font id="line-number">596 </font><a name="596"></a>    <font id="formal-comment">/**
+<font id="line-number">597 </font><a name="597"></a>    * Append a boolean value. This increases the array's length by one.
+<font id="line-number">598 </font><a name="598"></a>    *
+<font id="line-number">599 </font><a name="599"></a>    * @param value
+<font id="line-number">600 </font><a name="600"></a>    * A boolean value.
+<font id="line-number">601 </font><a name="601"></a>    * @return this.
+<font id="line-number">602 </font><a name="602"></a>    */</font>
+<font id="line-number">603 </font><a name="603"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="boolean">boolean</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">604 </font><a name="604"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">value</font> <font id="hook">?</font> <font id="identifier">Boolean</font><font id="dot">.</font><font id="identifier">TRUE</font> <font id="colon">:</font> <font id="identifier">Boolean</font><font id="dot">.</font><font id="identifier">FALSE</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">605 </font><a name="605"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">606 </font><a name="606"></a>    <font id="right-brace">}</font>
+<font id="line-number">607 </font><a name="607"></a>
+<font id="line-number">608 </font><a name="608"></a>    <font id="formal-comment">/**
+<font id="line-number">609 </font><a name="609"></a>    * Put a value in the JSONArray, where the value will be a JSONArray which
+<font id="line-number">610 </font><a name="610"></a>    * is produced from a Collection.
+<font id="line-number">611 </font><a name="611"></a>    *
+<font id="line-number">612 </font><a name="612"></a>    * @param value
+<font id="line-number">613 </font><a name="613"></a>    * A Collection value.
+<font id="line-number">614 </font><a name="614"></a>    * @return this.
+<font id="line-number">615 </font><a name="615"></a>    */</font>
+<font id="line-number">616 </font><a name="616"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">Collection</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">617 </font><a name="617"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="new">new</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">618 </font><a name="618"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">619 </font><a name="619"></a>    <font id="right-brace">}</font>
+<font id="line-number">620 </font><a name="620"></a>
+<font id="line-number">621 </font><a name="621"></a>    <font id="formal-comment">/**
+<font id="line-number">622 </font><a name="622"></a>    * Append a double value. This increases the array's length by one.
+<font id="line-number">623 </font><a name="623"></a>    *
+<font id="line-number">624 </font><a name="624"></a>    * @param value
+<font id="line-number">625 </font><a name="625"></a>    * A double value.
+<font id="line-number">626 </font><a name="626"></a>    * @throws JSONException
+<font id="line-number">627 </font><a name="627"></a>    * if the value is not finite.
+<font id="line-number">628 </font><a name="628"></a>    * @return this.
+<font id="line-number">629 </font><a name="629"></a>    */</font>
+<font id="line-number">630 </font><a name="630"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="double">double</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">631 </font><a name="631"></a>        <font id="identifier">Double</font> <font id="identifier">d</font> <font id="assign">=</font> <font id="new">new</font> <font id="identifier">Double</font><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">632 </font><a name="632"></a>        <a href="JSONObject.java.html#de.general.json.JSONObject.testValidity" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">testValidity</font></a><font id="left-paren">(</font><font id="identifier">d</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">633 </font><a name="633"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">d</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">634 </font><a name="634"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">635 </font><a name="635"></a>    <font id="right-brace">}</font>
+<font id="line-number">636 </font><a name="636"></a>
+<font id="line-number">637 </font><a name="637"></a>    <font id="formal-comment">/**
+<font id="line-number">638 </font><a name="638"></a>    * Append an int value. This increases the array's length by one.
+<font id="line-number">639 </font><a name="639"></a>    *
+<font id="line-number">640 </font><a name="640"></a>    * @param value
+<font id="line-number">641 </font><a name="641"></a>    * An int value.
+<font id="line-number">642 </font><a name="642"></a>    * @return this.
+<font id="line-number">643 </font><a name="643"></a>    */</font>
+<font id="line-number">644 </font><a name="644"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">645 </font><a name="645"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="new">new</font> <font id="identifier">Integer</font><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">646 </font><a name="646"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">647 </font><a name="647"></a>    <font id="right-brace">}</font>
+<font id="line-number">648 </font><a name="648"></a>
+<font id="line-number">649 </font><a name="649"></a>    <font id="formal-comment">/**
+<font id="line-number">650 </font><a name="650"></a>    * Append an long value. This increases the array's length by one.
+<font id="line-number">651 </font><a name="651"></a>    *
+<font id="line-number">652 </font><a name="652"></a>    * @param value
+<font id="line-number">653 </font><a name="653"></a>    * A long value.
+<font id="line-number">654 </font><a name="654"></a>    * @return this.
+<font id="line-number">655 </font><a name="655"></a>    */</font>
+<font id="line-number">656 </font><a name="656"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="long">long</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">657 </font><a name="657"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="new">new</font> <font id="identifier">Long</font><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">658 </font><a name="658"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">659 </font><a name="659"></a>    <font id="right-brace">}</font>
+<font id="line-number">660 </font><a name="660"></a>
+<font id="line-number">661 </font><a name="661"></a>    <font id="formal-comment">/**
+<font id="line-number">662 </font><a name="662"></a>    * Put a value in the JSONArray, where the value will be a JSONObject which
+<font id="line-number">663 </font><a name="663"></a>    * is produced from a Map.
+<font id="line-number">664 </font><a name="664"></a>    *
+<font id="line-number">665 </font><a name="665"></a>    * @param value
+<font id="line-number">666 </font><a name="666"></a>    * A Map value.
+<font id="line-number">667 </font><a name="667"></a>    * @return this.
+<font id="line-number">668 </font><a name="668"></a>    */</font>
+<font id="line-number">669 </font><a name="669"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">Map</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">670 </font><a name="670"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="new">new</font> <a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">671 </font><a name="671"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">672 </font><a name="672"></a>    <font id="right-brace">}</font>
+<font id="line-number">673 </font><a name="673"></a>
+<font id="line-number">674 </font><a name="674"></a>    <font id="formal-comment">/**
+<font id="line-number">675 </font><a name="675"></a>    * Append an object value. This increases the array's length by one.
+<font id="line-number">676 </font><a name="676"></a>    *
+<font id="line-number">677 </font><a name="677"></a>    * @param value
+<font id="line-number">678 </font><a name="678"></a>    * An object value. The value should be a Boolean, Double,
+<font id="line-number">679 </font><a name="679"></a>    * Integer, JSONArray, JSONObject, Long, or String, or the
+<font id="line-number">680 </font><a name="680"></a>    * JSONObject.NULL object.
+<font id="line-number">681 </font><a name="681"></a>    * @return this.
+<font id="line-number">682 </font><a name="682"></a>    */</font>
+<font id="line-number">683 </font><a name="683"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">Object</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">684 </font><a name="684"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">add</font><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">685 </font><a name="685"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">686 </font><a name="686"></a>    <font id="right-brace">}</font>
+<font id="line-number">687 </font><a name="687"></a>
+<font id="line-number">688 </font><a name="688"></a>    <font id="formal-comment">/**
+<font id="line-number">689 </font><a name="689"></a>    * Put or replace a boolean value in the JSONArray. If the index is greater
+<font id="line-number">690 </font><a name="690"></a>    * than the length of the JSONArray, then null elements will be added as
+<font id="line-number">691 </font><a name="691"></a>    * necessary to pad it out.
+<font id="line-number">692 </font><a name="692"></a>    *
+<font id="line-number">693 </font><a name="693"></a>    * @param index
+<font id="line-number">694 </font><a name="694"></a>    * The subscript.
+<font id="line-number">695 </font><a name="695"></a>    * @param value
+<font id="line-number">696 </font><a name="696"></a>    * A boolean value.
+<font id="line-number">697 </font><a name="697"></a>    * @return this.
+<font id="line-number">698 </font><a name="698"></a>    * @throws JSONException
+<font id="line-number">699 </font><a name="699"></a>    * If the index is negative.
+<font id="line-number">700 </font><a name="700"></a>    */</font>
+<font id="line-number">701 </font><a name="701"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="boolean">boolean</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">702 </font><a name="702"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="identifier">value</font> <font id="hook">?</font> <font id="identifier">Boolean</font><font id="dot">.</font><font id="identifier">TRUE</font> <font id="colon">:</font> <font id="identifier">Boolean</font><font id="dot">.</font><font id="identifier">FALSE</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">703 </font><a name="703"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">704 </font><a name="704"></a>    <font id="right-brace">}</font>
+<font id="line-number">705 </font><a name="705"></a>
+<font id="line-number">706 </font><a name="706"></a>    <font id="formal-comment">/**
+<font id="line-number">707 </font><a name="707"></a>    * Put a value in the JSONArray, where the value will be a JSONArray which
+<font id="line-number">708 </font><a name="708"></a>    * is produced from a Collection.
+<font id="line-number">709 </font><a name="709"></a>    *
+<font id="line-number">710 </font><a name="710"></a>    * @param index
+<font id="line-number">711 </font><a name="711"></a>    * The subscript.
+<font id="line-number">712 </font><a name="712"></a>    * @param value
+<font id="line-number">713 </font><a name="713"></a>    * A Collection value.
+<font id="line-number">714 </font><a name="714"></a>    * @return this.
+<font id="line-number">715 </font><a name="715"></a>    * @throws JSONException
+<font id="line-number">716 </font><a name="716"></a>    * If the index is negative or if the value is not finite.
+<font id="line-number">717 </font><a name="717"></a>    */</font>
+<font id="line-number">718 </font><a name="718"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="identifier">Collection</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">719 </font><a name="719"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="new">new</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">720 </font><a name="720"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">721 </font><a name="721"></a>    <font id="right-brace">}</font>
+<font id="line-number">722 </font><a name="722"></a>
+<font id="line-number">723 </font><a name="723"></a>    <font id="formal-comment">/**
+<font id="line-number">724 </font><a name="724"></a>    * Put or replace a double value. If the index is greater than the length of
+<font id="line-number">725 </font><a name="725"></a>    * the JSONArray, then null elements will be added as necessary to pad it
+<font id="line-number">726 </font><a name="726"></a>    * out.
+<font id="line-number">727 </font><a name="727"></a>    *
+<font id="line-number">728 </font><a name="728"></a>    * @param index
+<font id="line-number">729 </font><a name="729"></a>    * The subscript.
+<font id="line-number">730 </font><a name="730"></a>    * @param value
+<font id="line-number">731 </font><a name="731"></a>    * A double value.
+<font id="line-number">732 </font><a name="732"></a>    * @return this.
+<font id="line-number">733 </font><a name="733"></a>    * @throws JSONException
+<font id="line-number">734 </font><a name="734"></a>    * If the index is negative or if the value is not finite.
+<font id="line-number">735 </font><a name="735"></a>    */</font>
+<font id="line-number">736 </font><a name="736"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="double">double</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">737 </font><a name="737"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="new">new</font> <font id="identifier">Double</font><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">738 </font><a name="738"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">739 </font><a name="739"></a>    <font id="right-brace">}</font>
+<font id="line-number">740 </font><a name="740"></a>
+<font id="line-number">741 </font><a name="741"></a>    <font id="formal-comment">/**
+<font id="line-number">742 </font><a name="742"></a>    * Put or replace an int value. If the index is greater than the length of
+<font id="line-number">743 </font><a name="743"></a>    * the JSONArray, then null elements will be added as necessary to pad it
+<font id="line-number">744 </font><a name="744"></a>    * out.
+<font id="line-number">745 </font><a name="745"></a>    *
+<font id="line-number">746 </font><a name="746"></a>    * @param index
+<font id="line-number">747 </font><a name="747"></a>    * The subscript.
+<font id="line-number">748 </font><a name="748"></a>    * @param value
+<font id="line-number">749 </font><a name="749"></a>    * An int value.
+<font id="line-number">750 </font><a name="750"></a>    * @return this.
+<font id="line-number">751 </font><a name="751"></a>    * @throws JSONException
+<font id="line-number">752 </font><a name="752"></a>    * If the index is negative.
+<font id="line-number">753 </font><a name="753"></a>    */</font>
+<font id="line-number">754 </font><a name="754"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="int">int</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">755 </font><a name="755"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="new">new</font> <font id="identifier">Integer</font><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">756 </font><a name="756"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">757 </font><a name="757"></a>    <font id="right-brace">}</font>
+<font id="line-number">758 </font><a name="758"></a>
+<font id="line-number">759 </font><a name="759"></a>    <font id="formal-comment">/**
+<font id="line-number">760 </font><a name="760"></a>    * Put or replace a long value. If the index is greater than the length of
+<font id="line-number">761 </font><a name="761"></a>    * the JSONArray, then null elements will be added as necessary to pad it
+<font id="line-number">762 </font><a name="762"></a>    * out.
+<font id="line-number">763 </font><a name="763"></a>    *
+<font id="line-number">764 </font><a name="764"></a>    * @param index
+<font id="line-number">765 </font><a name="765"></a>    * The subscript.
+<font id="line-number">766 </font><a name="766"></a>    * @param value
+<font id="line-number">767 </font><a name="767"></a>    * A long value.
+<font id="line-number">768 </font><a name="768"></a>    * @return this.
+<font id="line-number">769 </font><a name="769"></a>    * @throws JSONException
+<font id="line-number">770 </font><a name="770"></a>    * If the index is negative.
+<font id="line-number">771 </font><a name="771"></a>    */</font>
+<font id="line-number">772 </font><a name="772"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="long">long</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">773 </font><a name="773"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="new">new</font> <font id="identifier">Long</font><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">774 </font><a name="774"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">775 </font><a name="775"></a>    <font id="right-brace">}</font>
+<font id="line-number">776 </font><a name="776"></a>
+<font id="line-number">777 </font><a name="777"></a>    <font id="formal-comment">/**
+<font id="line-number">778 </font><a name="778"></a>    * Put a value in the JSONArray, where the value will be a JSONObject that
+<font id="line-number">779 </font><a name="779"></a>    * is produced from a Map.
+<font id="line-number">780 </font><a name="780"></a>    *
+<font id="line-number">781 </font><a name="781"></a>    * @param index
+<font id="line-number">782 </font><a name="782"></a>    * The subscript.
+<font id="line-number">783 </font><a name="783"></a>    * @param value
+<font id="line-number">784 </font><a name="784"></a>    * The Map value.
+<font id="line-number">785 </font><a name="785"></a>    * @return this.
+<font id="line-number">786 </font><a name="786"></a>    * @throws JSONException
+<font id="line-number">787 </font><a name="787"></a>    * If the index is negative or if the the value is an invalid
+<font id="line-number">788 </font><a name="788"></a>    * number.
+<font id="line-number">789 </font><a name="789"></a>    */</font>
+<font id="line-number">790 </font><a name="790"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="identifier">Map</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">791 </font><a name="791"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="new">new</font> <a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">792 </font><a name="792"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">793 </font><a name="793"></a>    <font id="right-brace">}</font>
+<font id="line-number">794 </font><a name="794"></a>
+<font id="line-number">795 </font><a name="795"></a>    <font id="formal-comment">/**
+<font id="line-number">796 </font><a name="796"></a>    * Put or replace an object value in the JSONArray. If the index is greater
+<font id="line-number">797 </font><a name="797"></a>    * than the length of the JSONArray, then null elements will be added as
+<font id="line-number">798 </font><a name="798"></a>    * necessary to pad it out.
+<font id="line-number">799 </font><a name="799"></a>    *
+<font id="line-number">800 </font><a name="800"></a>    * @param index
+<font id="line-number">801 </font><a name="801"></a>    * The subscript.
+<font id="line-number">802 </font><a name="802"></a>    * @param value
+<font id="line-number">803 </font><a name="803"></a>    * The value to put into the array. The value should be a
+<font id="line-number">804 </font><a name="804"></a>    * Boolean, Double, Integer, JSONArray, JSONObject, Long, or
+<font id="line-number">805 </font><a name="805"></a>    * String, or the JSONObject.NULL object.
+<font id="line-number">806 </font><a name="806"></a>    * @return this.
+<font id="line-number">807 </font><a name="807"></a>    * @throws JSONException
+<font id="line-number">808 </font><a name="808"></a>    * If the index is negative or if the the value is an invalid
+<font id="line-number">809 </font><a name="809"></a>    * number.
+<font id="line-number">810 </font><a name="810"></a>    */</font>
+<font id="line-number">811 </font><a name="811"></a>    <font id="public">public</font> <a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <a name="de.general.json.JSONArray.put"></a><font id="identifier">put</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="comma">,</font> <font id="identifier">Object</font> <font id="identifier">value</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">812 </font><a name="812"></a>        <a href="JSONObject.java.html#de.general.json.JSONObject.testValidity" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">testValidity</font></a><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">813 </font><a name="813"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">index</font> <font id="lt">&lt;</font> <font id="integer-literal">0</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">814 </font><a name="814"></a>            <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="string-literal">"JSONArray["</font> <font id="plus">+</font> <font id="identifier">index</font> <font id="plus">+</font> <font id="string-literal">"] not found."</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">815 </font><a name="815"></a>        <font id="right-brace">}</font>
+<font id="line-number">816 </font><a name="816"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">index</font> <font id="lt">&lt;</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">length</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">817 </font><a name="817"></a>            <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">set</font><font id="left-paren">(</font><font id="identifier">index</font><font id="comma">,</font> <font id="identifier">value</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">818 </font><a name="818"></a>        <font id="right-brace">}</font> <font id="else">else</font> <font id="left-brace">{</font>
+<font id="line-number">819 </font><a name="819"></a>            <font id="while">while</font> <font id="left-paren">(</font><font id="identifier">index</font> <font id="ne">!=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">length</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">820 </font><a name="820"></a>                <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><a href="JSONObject.java.html#de.general.json.JSONObject.NULL" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">NULL</font></a><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">821 </font><a name="821"></a>            <font id="right-brace">}</font>
+<font id="line-number">822 </font><a name="822"></a>            <font id="this">this</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">value</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">823 </font><a name="823"></a>        <font id="right-brace">}</font>
+<font id="line-number">824 </font><a name="824"></a>        <font id="return">return</font> <font id="this">this</font><font id="semi-colon">;</font>
+<font id="line-number">825 </font><a name="825"></a>    <font id="right-brace">}</font>
+<font id="line-number">826 </font><a name="826"></a>
+<font id="line-number">827 </font><a name="827"></a>    <font id="formal-comment">/**
+<font id="line-number">828 </font><a name="828"></a>    * Remove an index and close the hole.
+<font id="line-number">829 </font><a name="829"></a>    *
+<font id="line-number">830 </font><a name="830"></a>    * @param index
+<font id="line-number">831 </font><a name="831"></a>    * The index of the element to be removed.
+<font id="line-number">832 </font><a name="832"></a>    * @return The value that was associated with the index, or null if there
+<font id="line-number">833 </font><a name="833"></a>    * was no value.
+<font id="line-number">834 </font><a name="834"></a>    */</font>
+<font id="line-number">835 </font><a name="835"></a>    <font id="public">public</font> <font id="identifier">Object</font> <a name="de.general.json.JSONArray.remove"></a><font id="identifier">remove</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">index</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">836 </font><a name="836"></a>        <font id="identifier">Object</font> <font id="identifier">o</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">opt</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">837 </font><a name="837"></a>        <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">remove</font><font id="left-paren">(</font><font id="identifier">index</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">838 </font><a name="838"></a>        <font id="return">return</font> <font id="identifier">o</font><font id="semi-colon">;</font>
+<font id="line-number">839 </font><a name="839"></a>    <font id="right-brace">}</font>
+<font id="line-number">840 </font><a name="840"></a>
+<font id="line-number">841 </font><a name="841"></a>    <font id="formal-comment">/**
+<font id="line-number">842 </font><a name="842"></a>    * Produce a JSONObject by combining a JSONArray of names with the values of
+<font id="line-number">843 </font><a name="843"></a>    * this JSONArray.
+<font id="line-number">844 </font><a name="844"></a>    *
+<font id="line-number">845 </font><a name="845"></a>    * @param names
+<font id="line-number">846 </font><a name="846"></a>    * A JSONArray containing a list of key strings. These will be
+<font id="line-number">847 </font><a name="847"></a>    * paired with the values.
+<font id="line-number">848 </font><a name="848"></a>    * @return A JSONObject, or null if there are no names or if this JSONArray
+<font id="line-number">849 </font><a name="849"></a>    * has no values.
+<font id="line-number">850 </font><a name="850"></a>    * @throws JSONException
+<font id="line-number">851 </font><a name="851"></a>    * If any of the names are null.
+<font id="line-number">852 </font><a name="852"></a>    */</font>
+<font id="line-number">853 </font><a name="853"></a>    <font id="public">public</font> <a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a> <a name="de.general.json.JSONArray.toJSONObject"></a><font id="identifier">toJSONObject</font><font id="left-paren">(</font><a href="#" target="source-frame"><font id="identifier">JSONArray</font></a> <font id="identifier">names</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">854 </font><a name="854"></a>        <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">names</font> <font id="eq">==</font> <font id="null">null</font> <font id="sc-or">||</font> <font id="identifier">names</font><font id="dot">.</font><font id="identifier">length</font><font id="left-paren">(</font><font id="right-paren">)</font> <font id="eq">==</font> <font id="integer-literal">0</font> <font id="sc-or">||</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">length</font><font id="left-paren">(</font><font id="right-paren">)</font> <font id="eq">==</font> <font id="integer-literal">0</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">855 </font><a name="855"></a>            <font id="return">return</font> <font id="null">null</font><font id="semi-colon">;</font>
+<font id="line-number">856 </font><a name="856"></a>        <font id="right-brace">}</font>
+<font id="line-number">857 </font><a name="857"></a>        <a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a> <font id="identifier">jo</font> <font id="assign">=</font> <font id="new">new</font> <a href="JSONObject.java.html" target="source-frame"><font id="identifier">JSONObject</font></a><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">858 </font><a name="858"></a>        <font id="for">for</font> <font id="left-paren">(</font><font id="int">int</font> <font id="identifier">i</font> <font id="assign">=</font> <font id="integer-literal">0</font><font id="semi-colon">;</font> <font id="identifier">i</font> <font id="lt">&lt;</font> <font id="identifier">names</font><font id="dot">.</font><font id="identifier">length</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font> <font id="identifier">i</font> <font id="plus-assign">+=</font> <font id="integer-literal">1</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">859 </font><a name="859"></a>            <font id="identifier">jo</font><font id="dot">.</font><font id="identifier">put</font><font id="left-paren">(</font><font id="identifier">names</font><font id="dot">.</font><font id="identifier">getString</font><font id="left-paren">(</font><font id="identifier">i</font><font id="right-paren">)</font><font id="comma">,</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">opt</font><font id="left-paren">(</font><font id="identifier">i</font><font id="right-paren">)</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">860 </font><a name="860"></a>        <font id="right-brace">}</font>
+<font id="line-number">861 </font><a name="861"></a>        <font id="return">return</font> <font id="identifier">jo</font><font id="semi-colon">;</font>
+<font id="line-number">862 </font><a name="862"></a>    <font id="right-brace">}</font>
+<font id="line-number">863 </font><a name="863"></a>
+<font id="line-number">864 </font><a name="864"></a>    <font id="formal-comment">/**
+<font id="line-number">865 </font><a name="865"></a>    * Make a JSON text of this JSONArray. For compactness, no unnecessary
+<font id="line-number">866 </font><a name="866"></a>    * whitespace is added. If it is not possible to produce a syntactically
+<font id="line-number">867 </font><a name="867"></a>    * correct JSON text then null will be returned instead. This could occur if
+<font id="line-number">868 </font><a name="868"></a>    * the array contains an invalid number.
+<font id="line-number">869 </font><a name="869"></a>    * &lt;p&gt;
+<font id="line-number">870 </font><a name="870"></a>    * Warning: This method assumes that the data structure is acyclical.
+<font id="line-number">871 </font><a name="871"></a>    *
+<font id="line-number">872 </font><a name="872"></a>    * @return a printable, displayable, transmittable representation of the
+<font id="line-number">873 </font><a name="873"></a>    * array.
+<font id="line-number">874 </font><a name="874"></a>    */</font>
+<font id="line-number">875 </font><a name="875"></a>    <font id="public">public</font> <font id="identifier">String</font> <a name="de.general.json.JSONArray.toString"></a><font id="identifier">toString</font><font id="left-paren">(</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">876 </font><a name="876"></a>        <font id="try">try</font> <font id="left-brace">{</font>
+<font id="line-number">877 </font><a name="877"></a>            <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">toString</font><font id="left-paren">(</font><font id="integer-literal">0</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">878 </font><a name="878"></a>        <font id="right-brace">}</font> <font id="catch">catch</font> <font id="left-paren">(</font><font id="identifier">Exception</font> <font id="identifier">e</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">879 </font><a name="879"></a>            <font id="return">return</font> <font id="null">null</font><font id="semi-colon">;</font>
+<font id="line-number">880 </font><a name="880"></a>        <font id="right-brace">}</font>
+<font id="line-number">881 </font><a name="881"></a>    <font id="right-brace">}</font>
+<font id="line-number">882 </font><a name="882"></a>
+<font id="line-number">883 </font><a name="883"></a>    <font id="formal-comment">/**
+<font id="line-number">884 </font><a name="884"></a>    * Make a prettyprinted JSON text of this JSONArray. Warning: This method
+<font id="line-number">885 </font><a name="885"></a>    * assumes that the data structure is acyclical.
+<font id="line-number">886 </font><a name="886"></a>    *
+<font id="line-number">887 </font><a name="887"></a>    * @param indentFactor
+<font id="line-number">888 </font><a name="888"></a>    * The number of spaces to add to each level of indentation.
+<font id="line-number">889 </font><a name="889"></a>    * @return a printable, displayable, transmittable representation of the
+<font id="line-number">890 </font><a name="890"></a>    * object, beginning with &lt;code&gt;[&lt;/code&gt;&amp;nbsp;&lt;small&gt;(left
+<font id="line-number">891 </font><a name="891"></a>    * bracket)&lt;/small&gt; and ending with &lt;code&gt;]&lt;/code&gt;
+<font id="line-number">892 </font><a name="892"></a>    * &amp;nbsp;&lt;small&gt;(right bracket)&lt;/small&gt;.
+<font id="line-number">893 </font><a name="893"></a>    * @throws JSONException
+<font id="line-number">894 </font><a name="894"></a>    */</font>
+<font id="line-number">895 </font><a name="895"></a>    <font id="public">public</font> <font id="identifier">String</font> <a name="de.general.json.JSONArray.toString"></a><font id="identifier">toString</font><font id="left-paren">(</font><font id="int">int</font> <font id="identifier">indentFactor</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">896 </font><a name="896"></a>        <font id="identifier">StringWriter</font> <font id="identifier">sw</font> <font id="assign">=</font> <font id="new">new</font> <font id="identifier">StringWriter</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">897 </font><a name="897"></a>        <font id="synchronized">synchronized</font> <font id="left-paren">(</font><font id="identifier">sw</font><font id="dot">.</font><font id="identifier">getBuffer</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">898 </font><a name="898"></a>            <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">write</font><font id="left-paren">(</font><font id="identifier">sw</font><font id="comma">,</font> <font id="identifier">indentFactor</font><font id="comma">,</font> <font id="integer-literal">0</font><font id="right-paren">)</font><font id="dot">.</font><font id="identifier">toString</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">899 </font><a name="899"></a>        <font id="right-brace">}</font>
+<font id="line-number">900 </font><a name="900"></a>    <font id="right-brace">}</font>
+<font id="line-number">901 </font><a name="901"></a>
+<font id="line-number">902 </font><a name="902"></a>    <font id="formal-comment">/**
+<font id="line-number">903 </font><a name="903"></a>    * Write the contents of the JSONArray as JSON text to a writer. For
+<font id="line-number">904 </font><a name="904"></a>    * compactness, no whitespace is added.
+<font id="line-number">905 </font><a name="905"></a>    * &lt;p&gt;
+<font id="line-number">906 </font><a name="906"></a>    * Warning: This method assumes that the data structure is acyclical.
+<font id="line-number">907 </font><a name="907"></a>    *
+<font id="line-number">908 </font><a name="908"></a>    * @return The writer.
+<font id="line-number">909 </font><a name="909"></a>    * @throws JSONException
+<font id="line-number">910 </font><a name="910"></a>    */</font>
+<font id="line-number">911 </font><a name="911"></a>    <font id="public">public</font> <font id="identifier">Writer</font> <a name="de.general.json.JSONArray.write"></a><font id="identifier">write</font><font id="left-paren">(</font><font id="identifier">Writer</font> <font id="identifier">writer</font><font id="right-paren">)</font> <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">912 </font><a name="912"></a>        <font id="return">return</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">write</font><font id="left-paren">(</font><font id="identifier">writer</font><font id="comma">,</font> <font id="integer-literal">0</font><font id="comma">,</font> <font id="integer-literal">0</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">913 </font><a name="913"></a>    <font id="right-brace">}</font>
+<font id="line-number">914 </font><a name="914"></a>
+<font id="line-number">915 </font><a name="915"></a>    <font id="formal-comment">/**
+<font id="line-number">916 </font><a name="916"></a>    * Write the contents of the JSONArray as JSON text to a writer. For
+<font id="line-number">917 </font><a name="917"></a>    * compactness, no whitespace is added.
+<font id="line-number">918 </font><a name="918"></a>    * &lt;p&gt;
+<font id="line-number">919 </font><a name="919"></a>    * Warning: This method assumes that the data structure is acyclical.
+<font id="line-number">920 </font><a name="920"></a>    *
+<font id="line-number">921 </font><a name="921"></a>    * @param indentFactor
+<font id="line-number">922 </font><a name="922"></a>    * The number of spaces to add to each level of indentation.
+<font id="line-number">923 </font><a name="923"></a>    * @param indent
+<font id="line-number">924 </font><a name="924"></a>    * The indention of the top level.
+<font id="line-number">925 </font><a name="925"></a>    * @return The writer.
+<font id="line-number">926 </font><a name="926"></a>    * @throws JSONException
+<font id="line-number">927 </font><a name="927"></a>    */</font>
+<font id="line-number">928 </font><a name="928"></a>    <font id="identifier">Writer</font> <a name="de.general.json.JSONArray.write"></a><font id="identifier">write</font><font id="left-paren">(</font><font id="identifier">Writer</font> <font id="identifier">writer</font><font id="comma">,</font> <font id="int">int</font> <font id="identifier">indentFactor</font><font id="comma">,</font> <font id="int">int</font> <font id="identifier">indent</font><font id="right-paren">)</font>
+<font id="line-number">929 </font><a name="929"></a>            <font id="throws">throws</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a> <font id="left-brace">{</font>
+<font id="line-number">930 </font><a name="930"></a>        <font id="try">try</font> <font id="left-brace">{</font>
+<font id="line-number">931 </font><a name="931"></a>            <font id="boolean">boolean</font> <font id="identifier">commanate</font> <font id="assign">=</font> <font id="false">false</font><font id="semi-colon">;</font>
+<font id="line-number">932 </font><a name="932"></a>            <font id="int">int</font> <font id="identifier">length</font> <font id="assign">=</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">length</font><font id="left-paren">(</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">933 </font><a name="933"></a>            <font id="identifier">writer</font><font id="dot">.</font><font id="identifier">write</font><font id="left-paren">(</font><font id="characer-literal">'['</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">934 </font><a name="934"></a>
+<font id="line-number">935 </font><a name="935"></a>            <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">length</font> <font id="eq">==</font> <font id="integer-literal">1</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">936 </font><a name="936"></a>                <a href="JSONObject.java.html#de.general.json.JSONObject.writeValue" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">writeValue</font></a><font id="left-paren">(</font><font id="identifier">writer</font><font id="comma">,</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="integer-literal">0</font><font id="right-paren">)</font><font id="comma">,</font>
+<font id="line-number">937 </font><a name="937"></a>                        <font id="identifier">indentFactor</font><font id="comma">,</font> <font id="identifier">indent</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">938 </font><a name="938"></a>            <font id="right-brace">}</font> <font id="else">else</font> <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">length</font> <font id="ne">!=</font> <font id="integer-literal">0</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">939 </font><a name="939"></a>                <font id="final">final</font> <font id="int">int</font> <font id="identifier">newindent</font> <font id="assign">=</font> <font id="identifier">indent</font> <font id="plus">+</font> <font id="identifier">indentFactor</font><font id="semi-colon">;</font>
+<font id="line-number">940 </font><a name="940"></a>
+<font id="line-number">941 </font><a name="941"></a>                <font id="for">for</font> <font id="left-paren">(</font><font id="int">int</font> <font id="identifier">i</font> <font id="assign">=</font> <font id="integer-literal">0</font><font id="semi-colon">;</font> <font id="identifier">i</font> <font id="lt">&lt;</font> <font id="identifier">length</font><font id="semi-colon">;</font> <font id="identifier">i</font> <font id="plus-assign">+=</font> <font id="integer-literal">1</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">942 </font><a name="942"></a>                    <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">commanate</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">943 </font><a name="943"></a>                        <font id="identifier">writer</font><font id="dot">.</font><font id="identifier">write</font><font id="left-paren">(</font><font id="characer-literal">','</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">944 </font><a name="944"></a>                    <font id="right-brace">}</font>
+<font id="line-number">945 </font><a name="945"></a>                    <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">indentFactor</font> <font id="gt">&gt;</font> <font id="integer-literal">0</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">946 </font><a name="946"></a>                        <font id="identifier">writer</font><font id="dot">.</font><font id="identifier">write</font><font id="left-paren">(</font><font id="characer-literal">'\n'</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">947 </font><a name="947"></a>                    <font id="right-brace">}</font>
+<font id="line-number">948 </font><a name="948"></a>                    <a href="JSONObject.java.html#de.general.json.JSONObject.indent" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">indent</font></a><font id="left-paren">(</font><font id="identifier">writer</font><font id="comma">,</font> <font id="identifier">newindent</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">949 </font><a name="949"></a>                    <a href="JSONObject.java.html#de.general.json.JSONObject.writeValue" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">writeValue</font></a><font id="left-paren">(</font><font id="identifier">writer</font><font id="comma">,</font> <font id="this">this</font><font id="dot">.</font><font id="identifier">myArrayList</font><font id="dot">.</font><font id="identifier">get</font><font id="left-paren">(</font><font id="identifier">i</font><font id="right-paren">)</font><font id="comma">,</font>
+<font id="line-number">950 </font><a name="950"></a>                            <font id="identifier">indentFactor</font><font id="comma">,</font> <font id="identifier">newindent</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">951 </font><a name="951"></a>                    <font id="identifier">commanate</font> <font id="assign">=</font> <font id="true">true</font><font id="semi-colon">;</font>
+<font id="line-number">952 </font><a name="952"></a>                <font id="right-brace">}</font>
+<font id="line-number">953 </font><a name="953"></a>                <font id="if">if</font> <font id="left-paren">(</font><font id="identifier">indentFactor</font> <font id="gt">&gt;</font> <font id="integer-literal">0</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">954 </font><a name="954"></a>                    <font id="identifier">writer</font><font id="dot">.</font><font id="identifier">write</font><font id="left-paren">(</font><font id="characer-literal">'\n'</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">955 </font><a name="955"></a>                <font id="right-brace">}</font>
+<font id="line-number">956 </font><a name="956"></a>                <a href="JSONObject.java.html#de.general.json.JSONObject.indent" target="source-frame"><font id="identifier">JSONObject</font><font id="dot">.</font><font id="identifier">indent</font></a><font id="left-paren">(</font><font id="identifier">writer</font><font id="comma">,</font> <font id="identifier">indent</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">957 </font><a name="957"></a>            <font id="right-brace">}</font>
+<font id="line-number">958 </font><a name="958"></a>            <font id="identifier">writer</font><font id="dot">.</font><font id="identifier">write</font><font id="left-paren">(</font><font id="characer-literal">']'</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">959 </font><a name="959"></a>            <font id="return">return</font> <font id="identifier">writer</font><font id="semi-colon">;</font>
+<font id="line-number">960 </font><a name="960"></a>        <font id="right-brace">}</font> <font id="catch">catch</font> <font id="left-paren">(</font><font id="identifier">IOException</font> <font id="identifier">e</font><font id="right-paren">)</font> <font id="left-brace">{</font>
+<font id="line-number">961 </font><a name="961"></a>            <font id="throw">throw</font> <font id="new">new</font> <a href="JSONException.java.html" target="source-frame"><font id="identifier">JSONException</font></a><font id="left-paren">(</font><font id="identifier">e</font><font id="right-paren">)</font><font id="semi-colon">;</font>
+<font id="line-number">962 </font><a name="962"></a>        <font id="right-brace">}</font>
+<font id="line-number">963 </font><a name="963"></a>    <font id="right-brace">}</font>
+<font id="line-number">964 </font><a name="964"></a>
+<font id="line-number">965 </font><a name="965"></a><font id="right-brace">}</font></pre>
+<table id="footer" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+<td colspan="2" width="20%">&nbsp;</td>
+<td align="center" colspan="2" width="60%">
+<font size="4"><a href="http://www.javadoq.com" target="_blank">JavaDoq</a>: JSONArray.java</font>
+</td>
+<td align="right" colspan="2" width="20%">&nbsp;</td>
+</tr>
+</table>
+</body>
+</html>

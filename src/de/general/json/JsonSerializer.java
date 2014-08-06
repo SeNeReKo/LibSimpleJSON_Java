@@ -1,0 +1,58 @@
+package de.general.json;
+
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+
+
+/**
+ *
+ * @author knauth
+ */
+public class JsonSerializer
+{
+
+	////////////////////////////////////////////////////////////////
+	// Properties
+	////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////
+	// Variables
+	////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////
+	// Constructors
+	////////////////////////////////////////////////////////////////
+
+	/**
+	 * Constructor.
+	 */
+	public JsonSerializer()
+	{
+	}
+
+	////////////////////////////////////////////////////////////////
+	// Methods
+	////////////////////////////////////////////////////////////////
+
+	public void serialize(JToken obj, StringWriter sw)
+	{
+		sw.write(obj.toJSON());
+	}
+
+	public String serialize(JToken obj)
+	{
+		StringWriter sw = new StringWriter();
+		sw.write(obj.toJSON());
+		return sw.toString();
+	}
+
+	public JObject deserialize(String text) throws Exception
+	{
+		JSONObject obj = new JSONObject(new JSONTokener(new StringReader(text)));
+		return new JObject(obj);
+	}
+
+}
